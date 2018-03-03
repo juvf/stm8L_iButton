@@ -11,6 +11,7 @@
 #include "rfClient.h"
 #include "utils.h"
 #include "eeprom.h"
+#include "iButton.h"
 
 #include <string.h>
 
@@ -45,15 +46,10 @@ int main()
 //	jLora.rfm95.setFrequency((uint32_t)(14166526));//14167244 - 500 ));//- 564));
 //#endif
 	wasCheckedImpl = true;
-        
-        //serial.print("\rProg Alarm\r");
-		//serial.flush();
-
-	//serial.print("Prog Alarm\r");
-        //serial.flush();
 
 	while(1)
 	{
+		checkIButton();
 		if(isSendLora)
 		{
 			while(timeToSleepUart > 0)

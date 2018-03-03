@@ -2164,6 +2164,12 @@
         <name>$PROJ_DIR$\eeprom.h</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\iButton.cpp</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\iButton.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\JLora.cpp</name>
     </file>
     <file>
