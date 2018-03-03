@@ -36,11 +36,7 @@ public:
 	bool waitCAD();
 	bool isChannelActive();
 	bool isSending();
-#ifndef UNUSE_DIO_0
-	void waitPacketSent();
-#else
 	bool reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout);  
-#endif
 	uint8_t getReg(uint8_t numReg) const;
 
 	void handleInterrupt();

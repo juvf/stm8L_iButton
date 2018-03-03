@@ -219,7 +219,6 @@ void JRfm95::setMode(RHMode mode)
 			if(_mode != RHModeTx)
 			{
 				spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
-#ifdef UNUSE_DIO_0
 				uint8_t value;
 				do
 				{
@@ -227,11 +226,6 @@ void JRfm95::setMode(RHMode mode)
 				} while((value & RH_RF95_TX_DONE) == 0);
 				spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 				_mode = RHModeIdle;
-				//setMode(RHModeIdle);
-#else
-				spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x40); // Interrupt on TxDone
-				_mode = RHModeTx;
-#endif //UNUSE_DIO_0
 			}
 			break;
 		case RHModeSleep:
@@ -244,27 +238,6 @@ void JRfm95::setMode(RHMode mode)
 	}
 }
 
-#ifndef UNUSE_DIO_0
-//#pragma optimize=none
-void JRfm95::waitPacketSent()
-{
-	/*
-
-	 while(_mode == RHModeTx)
-	 {
-	 uint8_t f = spi->read(RH_RF95_REG_01_OP_MODE);
-	 if((f&RH_RF95_MODE_TX) != RH_RF95_MODE_TX)
-	 {
-	 setMode(RHModeIdle);
-	 break;
-	 }
-	 }
-	 #else*/
-	while(_mode == RHModeTx)
-	; // Wait for any previous transmit to finish
-//
-}
-#endif
 bool JRfm95::waitCAD()
 {
 	if(!_cad_timeout)
@@ -299,7 +272,7 @@ bool JRfm95::isChannelActive()
 		spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x80); // Interrupt on CadDone
 		_mode = RHModeCad;
 	}
-#ifdef UNUSE_DIO_0
+
 
 	static uint8_t value;
 	do
@@ -311,24 +284,12 @@ bool JRfm95::isChannelActive()
 	spi->write(RH_RF95_REG_12_IRQ_FLAGS,
 	RH_RF95_CAD_DONE | RH_RF95_CAD_DETECTED); // Clear CAD IRQ flags
 	setMode(RHModeIdle);
-#else
-	while(_mode == RHModeCad)
-	;
-#endif
 
 	return _cad;
 }
 //#pragma optimize=none
 bool JRfm95::send(const uint8_t* data, uint8_t len)
 {
-//if(len > RH_RF95_FIFO_SIZE)
-//	return false;
-
-#ifndef UNUSE_DIO_0
-	waitPacketSent(); // Make sure we dont interrupt an outgoing message
-	setMode(RHModeIdle);
-#endif
-
 	if(!waitCAD())
 	{
 		setMode(RHModeIdle);
@@ -348,9 +309,7 @@ bool JRfm95::send(const uint8_t* data, uint8_t len)
 	for(int i = 0; i < len; i++)
 		spi->write(RH_RF95_REG_00_FIFO, data[i]);
 
-	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
-
-#ifdef UNUSE_DIO_0	
+	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);	
 	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
 	uint8_t value;
 	do
@@ -360,10 +319,6 @@ bool JRfm95::send(const uint8_t* data, uint8_t len)
 	spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 
 	setMode(RHModeIdle);
-#else	
-	setMode(RHModeTx); // Start the transmitter
-// when Tx is done, interruptHandler will fire and radio mode will return to STANDBY
-#endif
 	return true;
 }
 
@@ -376,10 +331,8 @@ void JRfm95::handleInterrupt()
 {
 // Read the interrupt register
 	uint8_t irq_flags = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
-#ifdef UNUSE_DIO_0
 	if(irq_flags == 0)
 		return;
-#endif
 	if(_mode == RHModeRx
 			&& irq_flags & (RH_RF95_RX_TIMEOUT | RH_RF95_PAYLOAD_CRC_ERROR))
 	{
@@ -436,7 +389,6 @@ uint8_t JRfm95::getReg(uint8_t numReg) const
 	return spi->read(numReg);
 }
 
-#ifdef UNUSE_DIO_0
 /*
  * получает в аргументах len - максимальное кол-во принимаемых байт(размер буффера buff)
  * возвращает true, если получен пакет. Если таймаут выйдет - вернет false.
@@ -485,35 +437,5 @@ bool JRfm95::reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout)
 		ATOMIC_BLOCK_END
 	;
 	return true;
-}
-#endif
-
-bool JRfm95::recive(uint8_t* buf, uint8_t* len)
-{
-#ifdef UNUSE_DIO_0
-	return false;
-#else
-	if (!available())
-	return false;
-	if(buf && len)
-	{
-		ATOMIC_BLOCK_START;
-		// Skip the 4 headers that are at the beginning of the rxBuf
-		/*if (*len > _bufLen-RH_RF95_HEADER_LEN)
-		 *len = _bufLen-RH_RF95_HEADER_LEN;
-		 memcpy(buf, _buf+RH_RF95_HEADER_LEN, *len);*/
-
-		if (*len > _bufLen)
-		*len = _bufLen;
-		memcpy(buf, _buf, *len);
-		ATOMIC_BLOCK_END;
-	}
-//clearRxBuf(); // This message accepted and cleared
-	{
-		_rxBufValid = false;
-		_bufLen = 0;
-	}
-	return true;
-#endif
 }
 

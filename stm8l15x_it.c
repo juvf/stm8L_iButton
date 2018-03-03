@@ -44,8 +44,6 @@
 extern void tim4Handler();
 extern void handlerUsartRxD();
 extern void handlerUsartTxD();
-extern void interruptDio();
-extern void isrImpl(uint8_t port);
 extern void wakeup();
 extern void isrSerial();
 
@@ -134,36 +132,18 @@ INTERRUPT_HANDLER(EXTIB_G_IRQHandler,6)
   portB = temp;  */
 }
 INTERRUPT_HANDLER(EXTID_H_IRQHandler,7){}
-#ifdef UNUSE_DIO_0
 INTERRUPT_HANDLER(EXTI0_IRQHandler,8)
 {
-	EXTI->SR1 = EXTI_IT_Pin0;
-	isrImpl(3);//
+  	EXTI->SR1 = EXTI_IT_Pin3;
 }
-#else
-INTERRUPT_HANDLER(EXTI0_IRQHandler,8)
-{
-  EXTI->SR1 = EXTI_IT_Pin0;
-  
-  esli budut prerivaniya ot PB0, to tut nado sdelat razbor ot kakogo porta INT
-  
-  interruptDio();
-}
-#endif
 INTERRUPT_HANDLER(EXTI1_IRQHandler,9)
 {
-	EXTI->SR1 = EXTI_IT_Pin1;
-	isrImpl(1);
 }
 INTERRUPT_HANDLER(EXTI2_IRQHandler,10)
 {
-	EXTI->SR1 = EXTI_IT_Pin2;
-	isrImpl(2);
 }
 INTERRUPT_HANDLER(EXTI3_IRQHandler,11)
 {
-	EXTI->SR1 = EXTI_IT_Pin3;
-	isrImpl(0);
 }
 INTERRUPT_HANDLER(EXTI4_IRQHandler,12){}
 INTERRUPT_HANDLER(EXTI5_IRQHandler,13){}
@@ -276,9 +256,6 @@ INTERRUPT_HANDLER(TIM4_UPD_OVF_TRG_IRQHandler,25)//TIM4 Update/Overflow/Trigger 
 {  
 	TIM4->SR1 &= ~TIM4_FLAG_Update;
   	tim4Handler();
-#ifdef UNUSE_DIO_0
-	//interruptDio();
-#endif
 }
 INTERRUPT_HANDLER(SPI1_IRQHandler,26){}
 

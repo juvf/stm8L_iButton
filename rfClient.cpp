@@ -1,7 +1,6 @@
 #include "rfClient.h"
 
 #include "Serial.h"
-#include "Lancher.h"
 #include "main.h"
 #include "Checksum.h"
 #include "JLora.h"
@@ -44,7 +43,7 @@ void setupRf95()
 	else
 	  serial.print("init failed", true);
 	serial.flush();	
-	jLora.printRegOfRfm95();
+	//jLora.printRegOfRfm95();
 }
 
 bool rfClientLoop()
@@ -58,7 +57,6 @@ bool rfClientLoop()
 	// Send a message to rf95_server
 	uint8_t data[4+4+2];
 	memcpyN(data, (uint8_t*)countImp, 8);
-	data[8] = getInput();//состояние выходов и входов
 	data[9] = (uint8_t)config.countStarts;
 
 	return jLora.sendPayload(2, data, 10);

@@ -51,7 +51,7 @@ void tim4Handler()
 	if(timeToSleepUart)
 	  --timeToSleepUart;
 	  
-	LancherCallback();
+	//LancherCallback();
 }
 
 

@@ -6,7 +6,6 @@
 #include "timerJ.h"
 #include "main.h"
 #include "Serial.h"
-#include "Lancher.h"
 #include "JRfm95.h"
 #include "rfClient.h"
 #include "utils.h"
@@ -45,7 +44,6 @@ int main()
 //#ifdef SX1272
 //	jLora.rfm95.setFrequency((uint32_t)(14166526));//14167244 - 500 ));//- 564));
 //#endif
-	wasCheckedImpl = true;
 
 	while(1)
 	{
@@ -72,32 +70,6 @@ int main()
 		//serial.print(".");
 		if(serial.isGetCommand())
 			sendReplay();
-
-		if(timeToSleepUart == 0)
-		{
-			if(wasCheckedImpl)
-			{
-				wasCheckedImpl = false;
-				for(uint8_t i = 0; i < 4; i++)
-				{
-					serial.print(countImp[i]);
-					serial.print("/");
-				}
-				serial.print(timeOpros);
-				serial.print("  \r");
-				serial.flush();
-			}
-		}
-#ifdef STORE_COUNT
-		for(uint8_t i = 0; i<4; i++)
-		{
-			if(writeIml[i])
-			{
-				writeIml[i] = 0;
-				countImpLok[i] = countImp[i];
-			}
-		}
-#endif
 		checkSleep();
 	}
 }
@@ -105,26 +77,19 @@ int main()
 void initPeref()
 {
 	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // Порт управление реле    Порт управление Led
+    GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Slow); // Порт управление питанием на iButton
+    GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_No_IT); // Порт 1-Wire на iButton
 	//
 
 	serial.init();
 	intiTimerJ();
-	Lancher::init();
 	initWakeup();
-#ifndef UNUSE_DIO_0  
-	//initial interupt port for Rfm95 Rising
-	GPIO_Init(GPIOD, RFM_PIN_INT, GPIO_Mode_In_FL_IT);// Input floating, with external interrupt
-	EXTI->CR1 |= EXTI_Trigger_Rising;//прерывание по переднему фронту для RFM95
-	EXTI->SR1 = 1;//сброс флагов
-#endif // UNUSE_DIO_0
 	//GPIO_Init(GPIOC, RFM_PIN_RESET, GPIO_Mode_Out_PP_High_Slow );
 	GPIO_Init(GPIOC, RFM_PIN_RESET, GPIO_Mode_Out_OD_HiZ_Slow);
 	//неиспользуемые пины
 	GPIO_Init(GPIOA, GPIO_Pin_1 | GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); //GPIO_Mode_In_PU_No_IT
 	GPIO_Init(GPIOC, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
-#ifdef UNUSE_DIO_0  
 	GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); //initial interupt port for Rfm95 Rising
-#endif // UNUSE_DIO_0
 
 	enableInterrupts();
 

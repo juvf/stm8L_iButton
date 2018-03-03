@@ -5,7 +5,6 @@
 #include "varInEeprom.h"
 
 extern uint16_t timeOpros;
-extern bool wasCheckedImpl;
 extern volatile bool isSendLora;
 extern bool isSacsesfulSend;//если false, то передать следующий пакет не позже чем через час
 #define MAX_OPROS 60
@@ -61,7 +60,6 @@ void initWakeup()
 #pragma optimize=none
 void wakeup()
 {
-  wasCheckedImpl = true;
   if(isSacsesfulSend || (periodOprosa < MAX_OPROS))
   {
    if(++timeOpros >= periodOprosa)
