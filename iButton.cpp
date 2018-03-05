@@ -16,32 +16,88 @@ void checkIButton()
 	switch(iBut)
 	{
 		case 1: //сработало, возможно каснулись.
+		case 2: //вторая попытка прочитать ключ
 		{
-//			подождем 2 мс
-			delayMs(2);
-			if(GPIOB->IDR & GPIO_Pin_3)
-			{
-				//записывем команду
-
-				OWReadKey();
-				uint8_t y = iButtonCrc();
-				if(y==0)
-					asm("nop");
-				iBut = 0;
-				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
-
+			if(readKey())
+			{ //прислонили ключ
+				if(keyIsGood())
+				{
+				  disableInterrupts();
+					//меняем состояние охрана/снято
+					switch(protection)
+					{
+						case 0: //снято с охраны - ставим
+							timerProt = 10000;
+							protection = 1;
+							break;
+						case 1: //постановка на охрану
+							timerProt = 0;
+							ledOff();
+							protection = 0;
+							break;
+						case 2: //сработал датчик, сняте с охраны
+							protection = 0;
+							ledOff();
+							break;
+						case 4: //стоит на охране
+							timerProt = 1000;
+							protection = 0;
+							break;
+						case 3://была тревога, отключаем
+							protection = 0;
+							break;
+					}
+					iBut = 4;
+					protectPause = 1000;
+					enableInterrupts();
+				}
 			}
 			else
+				iBut++;
+		}
+			break;
+		case 3: //не смогли 2 раза прочитать. ложимси спать
+			break;
+		case 4: //защитная пауза в 3 секунды
+			if(protectPause == 0)
 			{
 				iBut = 0;
 				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 			}
-
-		}
 			break;
 	}
-
 }
+
+bool keyIsGood()
+{
+	return true;
+	for(uint8_t i = 1; i < 7; i++)
+		if(iarray[i] != 0)
+			return false;
+	return true;
+}
+
+bool readKey()
+{
+	delayMs(2);
+	if(GPIOB->IDR & GPIO_Pin_3)
+	{
+		//записывем команду
+
+		OWReadKey();
+		uint8_t y = iButtonCrc();
+		if(y == 0)
+			return true;
+		GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
+	}
+	return false;
+	//else
+	{
+		iBut = 0;
+		GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
+	}
+}
+
 #pragma optimize=none
 void OWWriteByte(uint8_t byte)
 {
@@ -93,7 +149,7 @@ void OWReadKey()
 
 	for(uint8_t i = 0; i < 8; i++)
 	{
-          iarray[i] = 0;
+		iarray[i] = 0;
 		disableInterrupts();
 		for(uint8_t j = 0; j < 8; j++)
 		{

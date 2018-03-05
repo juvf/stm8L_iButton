@@ -17,9 +17,12 @@
 uint8_t timeToSleep = 0;
 uint16_t timeToSleepUart = 250;
 volatile uint16_t timeOpros = 0; //счетчик, при достижении которым будет отправка на распбери
-uint8_t iBut = 0;
+uint8_t iBut = 0; //состояние работы с iButton
 //int offset = -200;
 bool isSacsesfulSend; //если false, то передать следующий пакет не позже чем через час
+uint8_t protection = 0;
+uint16_t timerProt = 0;//таймер снятия постановки на охрану, мс
+uint16_t protectPause = 0;//защита от дребезга iButton, мс
 
 int main()
 {
@@ -50,6 +53,24 @@ int main()
 	{
 		if( iBut )
 			checkIButton();
+		switch(protection)
+		{
+			case 0:
+				break;
+			case 1://ставим на охрану
+				if(timerProt == 0)
+					protection = 4;
+				break;
+			case 2://снимаем с охраны
+				if(timerProt == 0)
+					protection = 3;
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+		}
+
 		if(isSendLora)
 		{
 			while(timeToSleepUart > 0)
@@ -78,8 +99,7 @@ int main()
 
 void initPeref()
 {
-	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // Порт управление реле    Порт управление Led
-    //GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Slow); // Порт управление питанием на iButton
+	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // Порт управление Led PB_10
     GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); // Порт 1-Wire на iButton
 
     //настроим прерывания
