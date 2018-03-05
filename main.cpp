@@ -40,7 +40,7 @@ int main()
 
 	delayMs(1000);
 	ledOff();
-	isSendLora = true;
+	//isSendLora = true;
 	//int tik = 0;
 //#ifdef SX1272
 //	jLora.rfm95.setFrequency((uint32_t)(14166526));//14167244 - 500 ));//- 564));

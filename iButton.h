@@ -14,6 +14,6 @@
 void checkIButton();
 void OWWriteByte(uint8_t byte);
 void OWReadKey();
-
+uint8_t iButtonCrc();
 
 #endif /* IBUTTON_H_ */

@@ -9,7 +9,7 @@
 #include "main.h"
 
 extern uint8_t iBut;
-uint8_t array[8];
+uint8_t iarray[8];
 #pragma optimize=none
 void checkIButton()
 {
@@ -24,6 +24,9 @@ void checkIButton()
 				//записывем команду
 
 				OWReadKey();
+				uint8_t y = iButtonCrc();
+				if(y==0)
+					asm("nop");
 				iBut = 0;
 				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 
@@ -43,10 +46,9 @@ void checkIButton()
 void OWWriteByte(uint8_t byte)
 {
 	disableInterrupts();
-	uint8_t array[8];
 	for(uint8_t i = 0; i < 8; i++)
 	{
-		array[i] = (byte >> i) & 1;
+		iarray[i] = (byte >> i) & 1;
 	}
 	for(uint8_t i = 0; i < 8; i++)
 	{
@@ -55,7 +57,7 @@ void OWWriteByte(uint8_t byte)
 		for(uint8_t y = 0; y < 3; y++)
 			; //15 мкс паузы
 
-		if(array[i])
+		if(iarray[i])
 			GPIOB->ODR |= GPIO_Pin_3; //шину в 1
 
 		for(uint8_t y = 0; y < 20; y++)
@@ -84,14 +86,14 @@ void OWReadKey()
 		return;
 	}
 	for(uint8_t y = 0; y < 30; y++)
-		; 
+		;
 	enableInterrupts();
 
 	OWWriteByte(0x33);
 
 	for(uint8_t i = 0; i < 8; i++)
 	{
-          array[i] = 0;
+          iarray[i] = 0;
 		disableInterrupts();
 		for(uint8_t j = 0; j < 8; j++)
 		{
@@ -102,14 +104,33 @@ void OWReadKey()
 
 			GPIOB->ODR |= GPIO_Pin_3; //шину в 1
 
-			for(uint8_t y = 0; y < 8; y++)
+			for(uint8_t y = 0; y < 3; y++)
 				; //10 мкс паузы
 			uint8_t bit = GPIOB->IDR & GPIO_Pin_3; //шину в 1
-			array[i] |= (bit ? 1 : 0) << j;
+			//GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
+			//GPIOB->ODR |= GPIO_Pin_3; //шину в 1
+			iarray[i] |= (bit ? 1 : 0) << j;
 
-			for(uint8_t y = 0; y < 2; y++)
+			for(uint8_t y = 0; y < 5; y++)
 				; //10
 		}
 		enableInterrupts();
 	}
+}
+
+uint8_t iButtonCrc()
+{
+	uint8_t crc = 0;
+	for(int i = 0; i < 8; i++)
+	{
+		crc ^= iarray[i];
+		for(int j = 0; j < 8; j++)
+		{
+			if(crc & 1)
+				crc = (crc >> 1) ^ 0x8c;
+			else
+				crc >>= 1;
+		}
+	}
+	return crc;
 }
