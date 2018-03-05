@@ -19,15 +19,18 @@ uint16_t timeToSleepUart = 250;
 volatile uint16_t timeOpros = 0; //счетчик, при достижении которым будет отправка на распбери
 uint8_t iBut = 0; //состояние работы с iButton
 //int offset = -200;
-uint8_t protection = 0;
 
-uint8_t sendProtect = 0; //пакет который нужно отправить по охране
+volatile bool isSendLora; //пакет нужно отправить по охране
+uint8_t protection;
 
 uint16_t timerProt = 0;//таймер снятия постановки на охрану, мс
 uint16_t protectPause = 0;//защита от дребезга iButton, мс
 
+#pragma optimize=none
 int main()
 {
+  isSendLora = true;
+  protection = 0;
 	disableInterrupts();
 
 	EEPROM_Unlock();
@@ -44,7 +47,6 @@ int main()
 
 	delayMs(1000);
 	ledOff();
-	sendProtect = 6;
 	//int tik = 0;
 //#ifdef SX1272
 //	jLora.rfm95.setFrequency((uint32_t)(14166526));//14167244 - 500 ));//- 564));
@@ -54,19 +56,20 @@ int main()
 	{
 		if( iBut )
 			checkIButton();
-		if(sendProtect)
+		if(isSendLora)
 		{
 			while(timeToSleepUart > 0)
 				;
 			if(enTransmit)
 			{
-				serial.print("\n\rSend to rf95 ", false);
-				serial.println(sendProtect);
-				if(jLora.sendPayload(sendProtect))
-					sendProtect = 0;
+				serial.print("\n\rSend to rf95", true);
+				serial.print("protection = ", false);
+				serial.println(protection);
+				if(jLora.sendPayload(protection))
+					isSendLora = 0;
 			}
 			else
-				sendProtect = 0;
+				isSendLora = 0;
 		}
 
 		switch(protection)
@@ -75,15 +78,18 @@ int main()
 				break;
 			case 1://ставим на охрану
 				if(timerProt == 0)
+				{
+					isSendLora = true;
 					protection = 2;
+				}
 				break;
-			case 2://снимаем с охраны
+			case 4://снимаем с охраны
 				if(timerProt == 0)
 					protection = 3;
 				break;
 			case 3:
 				break;
-			case 4:
+			case 2://охраняем
 				break;
 		}
 

@@ -39,17 +39,7 @@ extern uint8_t protection;
 extern uint16_t timerProt;
 extern uint16_t protectPause;
 
-/*
- * 0 - ни чего не слать
- * 1 - постановка на охрану
- * 2 - вз€тие под охрану
- * 3 - сработка датчика (ожидание сн€ти€ с охраны)
- * 4 - сн€тие с охраны
- * 5 - тревога
- * 6 - включение, т.е. перва€ отправка пакета
- * 7 - keepalive
- */
-extern uint8_t sendProtect; //пакет который нужно отправить по охране
+extern volatile bool isSendLora; //пакет который нужно отправить по охране
 
 void initPeref();
 void checkSleep();

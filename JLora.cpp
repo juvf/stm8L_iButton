@@ -15,7 +15,7 @@
 
 #include <string.h>
 
-#define ATTEMPT	3
+#define ATTEMPT	10
 
 JLora::JLora()
 {
@@ -71,19 +71,19 @@ bool JLora::sendPayload(uint8_t protect)
 				{
 					serial.print("crc ok!\n\r");
 
-					uint16_t adr = WORD_FROM_ARRAY(&array[0]);
-					uint16_t sourc = WORD_FROM_ARRAY(&array[2]);
-					uint16_t pack = WORD_FROM_ARRAY(&array[4]);
-					uint8_t type = array[6];
+					//uint16_t adr = WORD_FROM_ARRAY(&array[0]);
+					//uint16_t sourc = WORD_FROM_ARRAY(&array[2]);
+					//uint16_t pack = WORD_FROM_ARRAY(&array[4]);
+					//uint8_t type = array[6];
 
-					serial.print("src= ");
+					/*serial.print("src= ");
 					serial.println(adr);
 					serial.print("sourc= ");
 					serial.println(sourc);
 					serial.print("pack= ");
 					serial.println(pack);
 					serial.print("type= ");
-					serial.println(type);
+					serial.println(type);*/
 
 					if(((WORD_FROM_ARRAY(&array[0])) == config.addressOfModul)
 							&& (WORD_FROM_ARRAY(&array[2])

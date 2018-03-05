@@ -6,7 +6,7 @@
 
 extern uint16_t timeOpros;
 extern bool isSacsesfulSend;//если false, то передать следующий пакет не позже чем через час
-extern uint8_t sendProtect; //пакет который нужно отправить по охране
+extern volatile bool isSendLora;
 #define MAX_OPROS 60
 
 
@@ -62,7 +62,7 @@ void wakeup()
    if(++timeOpros >= periodOprosa)
 	{
 	  	timeOpros = 0;
-	  	sendProtect = 7;
+	  	isSendLora = true;
 	}
 }
 

@@ -147,6 +147,7 @@ INTERRUPT_HANDLER(EXTI3_IRQHandler,11)
 	EXTI->SR1 = EXTI_IT_Pin3;
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
 	iBut = 1;
+	//GPIOB->ODR |= GPIO_Pin_0;//включение светодиода
 }
 INTERRUPT_HANDLER(EXTI4_IRQHandler,12){}
 INTERRUPT_HANDLER(EXTI5_IRQHandler,13){}

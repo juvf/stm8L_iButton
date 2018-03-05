@@ -15,7 +15,6 @@
 #define SERVER_ADDRESS 1
 
 const char *txt_isOk = "init is Ok";
-volatile bool isSendLora = false; //если true, то пора отправлять данные на сервер
 
 JLora jLora;
 

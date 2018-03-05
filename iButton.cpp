@@ -8,7 +8,7 @@
 #include "timerJ.h"
 #include "main.h"
 
-const uint8_t goodKey[] = {0,0,0,0xb4, 0xbb, 0x2c};
+const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
 extern uint8_t iBut;
 uint8_t iarray[8];
@@ -24,33 +24,25 @@ void checkIButton()
 			{ //прислонили ключ
 				if(keyIsGood())
 				{
-				  disableInterrupts();
+					disableInterrupts();
 					//меняем состояние охрана/снято
 					switch(protection)
 					{
 						case 0: //снято с охраны - ставим
 							timerProt = 10000;
-							sendProtect = 1;
 							protection = 1;
+							isSendLora = true;
 							break;
 						case 1: //постановка на охрану, отмена
 							timerProt = 0;
 							ledOff();
 							protection = 0;
-							sendProtect = 4;
+							isSendLora = true;
 							break;
-						case 2: //сняте с охраны
+						case 2: //стоит на охране, сняте с охраны
 							protection = 0;
-							sendProtect = 4;
-							ledOff();
-							break;
-						case 4: //стоит на охране, снятие с охраны
 							timerProt = 1000;
-							sendProtect = 4;
-							protection = 0;
-							break;
-						case 3://была тревога, отключаем
-							protection = 0;
+							isSendLora = true;
 							break;
 					}
 					iBut = 4;
@@ -63,15 +55,20 @@ void checkIButton()
 		}
 			break;
 		case 3: //не смогли 2 раза прочитать. ложимси спать
+			disableInterrupts();
 			GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 			iBut = 0;
+			ledOff();
+			enableInterrupts();
 			break;
 		case 4: //защитная пауза в 3 секунды
+			disableInterrupts();
 			if(protectPause == 0)
 			{
 				iBut = 0;
 				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 			}
+			enableInterrupts();
 			break;
 	}
 }
@@ -79,7 +76,7 @@ void checkIButton()
 bool keyIsGood()
 {
 	for(uint8_t i = 0; i < 6; i++)
-		if(iarray[i+1] != goodKey[i])
+		if(iarray[i + 1] != goodKey[i])
 			return false;
 	return true;
 }
@@ -92,7 +89,7 @@ bool readKey()
 		//записывем команду
 
 		OWReadKey();
-		uint8_t y = iButtonCrc();
+		static uint8_t y = iButtonCrc();
 		if((y == 0) && (iarray[0] == 1))
 			return true;
 	}
@@ -128,6 +125,8 @@ void OWWriteByte(uint8_t byte)
 #pragma optimize=none
 void OWReadKey()
 {
+	for(uint8_t i = 0; i < 8; i++)
+		iarray[i] = 0;
 	disableInterrupts();
 	GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
 	for(uint16_t y = 0; y < 250; y++)
