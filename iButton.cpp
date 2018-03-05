@@ -68,18 +68,30 @@ void OWWriteByte(uint8_t byte)
 }
 #pragma optimize=none
 void OWReadKey()
-{   
+{
 	disableInterrupts();
 	GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
 	for(uint16_t y = 0; y < 250; y++)
-				; //10
+		;
 	GPIOB->ODR |= GPIO_Pin_3; //шину в 1
+	//enableInterrupts();
+
+	for(uint8_t y = 0; y < 40; y++)
+		; //100 us
+	if(GPIOB->IDR & GPIO_Pin_3)
+	{
+		enableInterrupts();
+		return;
+	}
+	for(uint8_t y = 0; y < 30; y++)
+		; 
 	enableInterrupts();
-	
+
 	OWWriteByte(0x33);
 
 	for(uint8_t i = 0; i < 8; i++)
 	{
+          array[i] = 0;
 		disableInterrupts();
 		for(uint8_t j = 0; j < 8; j++)
 		{
