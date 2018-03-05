@@ -7,6 +7,7 @@
 #include "iButton.h"
 #include "timerJ.h"
 #include "main.h"
+#include "Serial.h"
 
 const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
@@ -15,10 +16,15 @@ uint8_t iarray[8];
 #pragma optimize=none
 void checkIButton()
 {
+	//serial.print("i", false);
+	//serial.print(iBut);
 	switch(iBut)
 	{
 		case 1: //сработало, возможно каснулись.
 		case 2: //вторая попытка прочитать ключ
+		case 3:
+		case 4:
+		case 5:
 		{
 			if(readKey())
 			{ //прислонили ключ
@@ -45,8 +51,9 @@ void checkIButton()
 							isSendLora = true;
 							break;
 					}
-					iBut = 4;
+					iBut = 7;
 					protectPause = 1000;
+					serial.print("pp", false);
 					enableInterrupts();
 				}
 			}
@@ -54,14 +61,14 @@ void checkIButton()
 				iBut++;
 		}
 			break;
-		case 3: //не смогли 2 раза прочитать. ложимси спать
+		case 6: //не смогли 2 раза прочитать. ложимси спать
 			disableInterrupts();
 			GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 			iBut = 0;
 			ledOff();
 			enableInterrupts();
 			break;
-		case 4: //защитная пауза в 3 секунды
+		case 7: //защитная пауза в 3 секунды
 			disableInterrupts();
 			if(protectPause == 0)
 			{

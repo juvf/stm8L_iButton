@@ -62,7 +62,7 @@ int main()
 				;
 			if(enTransmit)
 			{
-				serial.print("\n\rSend to rf95", true);
+				//serial.print("\n\rSend to rf95", true);
 				serial.print("protection = ", false);
 				serial.println(protection);
 				if(jLora.sendPayload(protection))
