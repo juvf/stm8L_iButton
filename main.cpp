@@ -17,6 +17,7 @@
 uint8_t timeToSleep = 0;
 uint16_t timeToSleepUart = 250;
 volatile uint16_t timeOpros = 0; //счетчик, при достижении которым будет отправка на распбери
+uint8_t iBut = 0;
 //int offset = -200;
 bool isSacsesfulSend; //если false, то передать следующий пакет не позже чем через час
 
@@ -47,7 +48,8 @@ int main()
 
 	while(1)
 	{
-		checkIButton();
+		if( iBut )
+			checkIButton();
 		if(isSendLora)
 		{
 			while(timeToSleepUart > 0)
@@ -77,9 +79,12 @@ int main()
 void initPeref()
 {
 	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // Порт управление реле    Порт управление Led
-    GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Slow); // Порт управление питанием на iButton
-    GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_No_IT); // Порт 1-Wire на iButton
-	//
+    //GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_Out_PP_High_Slow); // Порт управление питанием на iButton
+    GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); // Порт 1-Wire на iButton
+
+    //настроим прерывания
+    EXTI->CR1 = EXTI_Trigger_Rising << 6; //прерывание по переднему фронту для порта PB3 (1-Wire)
+
 
 	serial.init();
 	intiTimerJ();

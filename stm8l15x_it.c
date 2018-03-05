@@ -46,6 +46,7 @@ extern void handlerUsartRxD();
 extern void handlerUsartTxD();
 extern void wakeup();
 extern void isrSerial();
+extern uint8_t iBut;
 
 #ifdef _COSMIC_
 /**
@@ -134,7 +135,6 @@ INTERRUPT_HANDLER(EXTIB_G_IRQHandler,6)
 INTERRUPT_HANDLER(EXTID_H_IRQHandler,7){}
 INTERRUPT_HANDLER(EXTI0_IRQHandler,8)
 {
-  	EXTI->SR1 = EXTI_IT_Pin3;
 }
 INTERRUPT_HANDLER(EXTI1_IRQHandler,9)
 {
@@ -144,6 +144,9 @@ INTERRUPT_HANDLER(EXTI2_IRQHandler,10)
 }
 INTERRUPT_HANDLER(EXTI3_IRQHandler,11)
 {
+	EXTI->SR1 = EXTI_IT_Pin3;
+	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
+	iBut = 1;
 }
 INTERRUPT_HANDLER(EXTI4_IRQHandler,12){}
 INTERRUPT_HANDLER(EXTI5_IRQHandler,13){}
@@ -190,16 +193,7 @@ INTERRUPT_HANDLER(ADC1_COMP_IRQHandler,18)
   */
 INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_USART2_TX_IRQHandler,19)
 {
-    /* In order to detect unexpected events during development,
-       it is recommended to set a breakpoint on the following instruction.
-    */
 }
-
-/**
-  * @brief Timer2 Capture/Compare / USART2 RX Interrupt routine.
-  * @param  None
-  * @retval None
-  */
 INTERRUPT_HANDLER(TIM2_CC_USART2_RX_IRQHandler,20)
 {
     /* In order to detect unexpected events during development,

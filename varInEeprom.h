@@ -7,10 +7,10 @@
 typedef struct
 {
 	uint16_t countStarts;
-	uint16_t periodOprosa;
+	uint16_t periodOprosa; //период, через который сигнализация будет передавать сигналы keepalive
 	uint16_t addressOfModul;
 	uint16_t addressOfServer;
-	uint8_t numChanel;
+	uint8_t numChanel; //номер частотного канала
 	uint8_t powerTx;
 	uint8_t crSf; //10 в мл тетраде sf, в старшей cr
 	uint8_t bw; //11 старший бит - 0=sx1272, 1=1276
