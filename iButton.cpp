@@ -7,45 +7,35 @@
 #include "iButton.h"
 #include "timerJ.h"
 #include "main.h"
+
+extern uint8_t iBut;
+uint8_t array[8];
 #pragma optimize=none
 void checkIButton()
 {
-	//if((GPIOB->IDR & GPIO_Pin_3) == 0)//на детекторе 0
+	switch(iBut)
 	{
-		GPIOB->ODR &= ~GPIO_Pin_0; //включить питание
-		//перевести шину в мастера
-		GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow); //шину в мастер
-		//паузу 1 мс, чтоб устаканилось всё
-		//delay_us(1000);
-
-		//записывем команду
-		OWWriteByte(0x33);
-		uint8_t array[8] = {0,0,0,0,0,0,0,0};
-		for(uint8_t i = 0; i < 8; i++)
+		case 1: //сработало, возможно каснулись.
 		{
-			disableInterrupts();
-			for(uint8_t j = 0; j < 8; j++)
+//			подождем 2 мс
+			delayMs(2);
+			if(GPIOB->IDR & GPIO_Pin_3)
 			{
-				GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
+				//записывем команду
 
-				for(uint8_t y = 0; y < 2; y++)
-					; //10 мкс паузы
+				OWReadKey();
+				iBut = 0;
+				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 
-				GPIOB->ODR |= GPIO_Pin_3; //шину в 1
-
-				for(uint8_t y = 0; y < 8; y++)
-					; //10 мкс паузы
-				uint8_t bit = GPIOB->IDR & GPIO_Pin_3; //шину в 1
-				array[i] |= (bit ? 1 : 0)<<j;
-
-				for(uint8_t y = 0; y < 2; y++)
-					; //10
 			}
-			enableInterrupts();
-		}
-		//читаем данные
+			else
+			{
+				iBut = 0;
+				GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
+			}
 
-		//GPIOB->ODR |= GPIO_Pin_0;		//включить питание
+		}
+			break;
 	}
 
 }
@@ -75,10 +65,39 @@ void OWWriteByte(uint8_t byte)
 			;
 	}
 	enableInterrupts();
-
 }
+#pragma optimize=none
+void OWReadKey()
+{   
+	disableInterrupts();
+	GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
+	for(uint16_t y = 0; y < 250; y++)
+				; //10
+	GPIOB->ODR |= GPIO_Pin_3; //шину в 1
+	enableInterrupts();
+	
+	OWWriteByte(0x33);
 
-uint8_t OWReadByte()
-{
+	for(uint8_t i = 0; i < 8; i++)
+	{
+		disableInterrupts();
+		for(uint8_t j = 0; j < 8; j++)
+		{
+			GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
 
+			for(uint8_t y = 0; y < 2; y++)
+				; //10 мкс паузы
+
+			GPIOB->ODR |= GPIO_Pin_3; //шину в 1
+
+			for(uint8_t y = 0; y < 8; y++)
+				; //10 мкс паузы
+			uint8_t bit = GPIOB->IDR & GPIO_Pin_3; //шину в 1
+			array[i] |= (bit ? 1 : 0) << j;
+
+			for(uint8_t y = 0; y < 2; y++)
+				; //10
+		}
+		enableInterrupts();
+	}
 }

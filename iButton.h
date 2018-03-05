@@ -13,7 +13,7 @@
 
 void checkIButton();
 void OWWriteByte(uint8_t byte);
-uint8_t OWReadByte();
+void OWReadKey();
 
 
 #endif /* IBUTTON_H_ */
