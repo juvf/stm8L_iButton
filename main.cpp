@@ -19,7 +19,6 @@ uint16_t timeToSleepUart = 250;
 volatile uint16_t timeOpros = 0; //счетчик, при достижении которым будет отправка на распбери
 uint8_t iBut = 0; //состояние работы с iButton
 //int offset = -200;
-bool isSacsesfulSend; //если false, то передать следующий пакет не позже чем через час
 uint8_t protection = 0;
 
 uint8_t sendProtect = 0; //пакет который нужно отправить по охране
@@ -46,7 +45,7 @@ int main()
 
 	delayMs(1000);
 	ledOff();
-	//isSendLora = true;
+	sendProtect = 6;
 	//int tik = 0;
 //#ifdef SX1272
 //	jLora.rfm95.setFrequency((uint32_t)(14166526));//14167244 - 500 ));//- 564));
@@ -56,6 +55,24 @@ int main()
 	{
 		if( iBut )
 			checkIButton();
+		if(sendProtect)
+		{
+			while(timeToSleepUart > 0)
+				;
+			if(enTransmit)
+			{
+				serial.print("\n\rSend to rf95 ", false);
+				serial.println(sendProtect);
+				isSacsesfulSend = jLora.sendPayload(sendProtect);
+			}
+			else
+				isSacsesfulSend = true;
+			if(periodOprosa)
+				isSendLora = false;
+			else
+				delayMs(10);
+		}
+
 		switch(protection)
 		{
 			case 0:
@@ -74,20 +91,6 @@ int main()
 				break;
 		}
 
-		//if(isSendLora)
-		if(sendProtect)
-		{
-			while(timeToSleepUart > 0)
-				;
-			if(enTransmit)
-				isSacsesfulSend = rfClientLoop(sendProtect);
-			else
-				isSacsesfulSend = true;
-			if(periodOprosa)
-				isSendLora = false;
-			else
-				delayMs(10);
-		}
 		//waitResive();
 		//serial.println(timeOpros);
 		//serial.print(".");

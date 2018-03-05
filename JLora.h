@@ -23,7 +23,7 @@ public:
 
 	JLora();
 
-	bool sendPayload(uint8_t type, const uint8_t *data, uint8_t len);
+	bool sendPayload(uint8_t protect);
 	bool waitAvailableTimeout(uint16_t timeout);
 	void printRegOfRfm95();
 	bool recive(uint8_t* buf, uint8_t* len);

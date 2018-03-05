@@ -46,22 +46,6 @@ void setupRf95()
 	//jLora.printRegOfRfm95();
 }
 
-bool rfClientLoop(uint8_t typeSend)
-{
-  //static uint32_t fff = 14167244 - 10000;
-  
-    //jLora.rfm95.setFrequency(fff);
-	serial.print("\n\rSend to rf95", true);
-       // serial.println(fff);
-       // fff += 100;
-	// Send a message to rf95_server
-	uint8_t data[4+4+2];
-	memcpyN(data, (uint8_t*)countImp, 8);
-	data[9] = (uint8_t)config.countStarts;
-
-	return jLora.sendPayload(2, data, 10);
-}
-
 void waitResive()
 {
 	uint8_t buf[32];//RH_RF95_FIFO_SIZE];

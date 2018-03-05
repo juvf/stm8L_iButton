@@ -5,10 +5,8 @@
 #include "varInEeprom.h"
 
 extern uint16_t timeOpros;
-extern volatile bool isSendLora;
 extern bool isSacsesfulSend;//если false, то передать следующий пакет не позже чем через час
 #define MAX_OPROS 60
-uint8_t timeForAlarm[2] = {0, 0}; 
 
 
 char *itoa(uint16_t number, char *destination, int base) 
@@ -60,26 +58,12 @@ void initWakeup()
 #pragma optimize=none
 void wakeup()
 {
-  if(isSacsesfulSend || (periodOprosa < MAX_OPROS))
-  {
    if(++timeOpros >= periodOprosa)
 	{
 	  	timeOpros = 0;
-	   isSendLora = true;
+	  	sendProtect = 7;
 	}
   }
-  else
-  {
-	 if(++timeOpros >= MAX_OPROS)
-	{
-	  	timeOpros = 0;
-	   isSendLora = true;
-	}
-  }
-  if(timeForAlarm[0])
-	  --timeForAlarm[0];
-    if(timeForAlarm[1])
-	  --timeForAlarm[1];
 }
 
 void initHaly()

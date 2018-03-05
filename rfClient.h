@@ -25,7 +25,6 @@ extern "C"
 extern JLora jLora;
 
 void setupRf95();
-bool rfClientLoop();
 void setNumChanel(uint8_t val);
 void waitResive();
 void parserLoraProtocol(uint8_t *buffer, uint8_t len);

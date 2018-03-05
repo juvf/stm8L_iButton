@@ -31,16 +31,18 @@ void checkIButton()
 							sendProtect = 1;
 							protection = 1;
 							break;
-						case 1: //постановка на охрану
+						case 1: //постановка на охрану, отмена
 							timerProt = 0;
 							ledOff();
 							protection = 0;
+							sendProtect = 4;
 							break;
-						case 2: //сработал датчик, сняте с охраны
+						case 2: //сняте с охраны
 							protection = 0;
+							sendProtect = 4;
 							ledOff();
 							break;
-						case 4: //стоит на охране
+						case 4: //стоит на охране, снятие с охраны
 							timerProt = 1000;
 							protection = 0;
 							break;
@@ -58,6 +60,8 @@ void checkIButton()
 		}
 			break;
 		case 3: //не смогли 2 раза прочитать. ложимси спать
+			GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
+			iBut = 0;
 			break;
 		case 4: //защитная пауза в 3 секунды
 			if(protectPause == 0)
@@ -89,14 +93,8 @@ bool readKey()
 		uint8_t y = iButtonCrc();
 		if(y == 0)
 			return true;
-		GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 	}
 	return false;
-	//else
-	{
-		iBut = 0;
-		GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
-	}
 }
 
 #pragma optimize=none
