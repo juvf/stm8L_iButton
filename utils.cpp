@@ -6,6 +6,7 @@
 
 extern uint16_t timeOpros;
 extern bool isSacsesfulSend;//если false, то передать следующий пакет не позже чем через час
+extern uint8_t sendProtect; //пакет который нужно отправить по охране
 #define MAX_OPROS 60
 
 
@@ -63,12 +64,11 @@ void wakeup()
 	  	timeOpros = 0;
 	  	sendProtect = 7;
 	}
-  }
 }
 
-void initHaly()
+void initHalt()
 {  
-GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_IT );//
+	GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_IT );//
 	USART1->CR2 = 0;
 }
 

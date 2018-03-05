@@ -8,6 +8,8 @@
 #include "timerJ.h"
 #include "main.h"
 
+const uint8_t goodKey[] = {0,0,0,0xb4, 0xbb, 0x2c};
+
 extern uint8_t iBut;
 uint8_t iarray[8];
 #pragma optimize=none
@@ -44,6 +46,7 @@ void checkIButton()
 							break;
 						case 4: //стоит на охране, снятие с охраны
 							timerProt = 1000;
+							sendProtect = 4;
 							protection = 0;
 							break;
 						case 3://была тревога, отключаем
@@ -75,9 +78,8 @@ void checkIButton()
 
 bool keyIsGood()
 {
-	return true;
-	for(uint8_t i = 1; i < 7; i++)
-		if(iarray[i] != 0)
+	for(uint8_t i = 0; i < 6; i++)
+		if(iarray[i+1] != goodKey[i])
 			return false;
 	return true;
 }
@@ -91,7 +93,7 @@ bool readKey()
 
 		OWReadKey();
 		uint8_t y = iButtonCrc();
-		if(y == 0)
+		if((y == 0) && (iarray[0] == 1))
 			return true;
 	}
 	return false;

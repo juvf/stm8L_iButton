@@ -20,7 +20,7 @@ extern uint8_t timeForAlarm[2];
 char *itoa(uint16_t number, char *destination, int base);
 void initWakeup();
 void wakeup();
-void initHaly();
+void initHalt();
 void sendReplay();
 void memcpyN(uint8_t *dis, const uint8_t *source, uint8_t len);
   

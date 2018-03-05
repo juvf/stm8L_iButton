@@ -28,7 +28,6 @@ uint16_t protectPause = 0;//защита от дребезга iButton, мс
 
 int main()
 {
-	isSacsesfulSend = true;
 	disableInterrupts();
 
 	EEPROM_Unlock();
@@ -63,14 +62,11 @@ int main()
 			{
 				serial.print("\n\rSend to rf95 ", false);
 				serial.println(sendProtect);
-				isSacsesfulSend = jLora.sendPayload(sendProtect);
+				if(jLora.sendPayload(sendProtect))
+					sendProtect = 0;
 			}
 			else
-				isSacsesfulSend = true;
-			if(periodOprosa)
-				isSendLora = false;
-			else
-				delayMs(10);
+				sendProtect = 0;
 		}
 
 		switch(protection)
@@ -79,7 +75,7 @@ int main()
 				break;
 			case 1://ставим на охрану
 				if(timerProt == 0)
-					protection = 4;
+					protection = 2;
 				break;
 			case 2://снимаем с охраны
 				if(timerProt == 0)
@@ -145,7 +141,7 @@ void checkSleep()
 
 		delayMs(500);
 #ifdef USE_HALT
-		initHaly();
+		initHalt();
 		//CLK->PCKENR1 = 0;
 		//GPIO_Init(GPIOB, GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7, GPIO_Mode_In_PU_No_IT );
 
