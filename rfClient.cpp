@@ -46,7 +46,7 @@ void setupRf95()
 	//jLora.printRegOfRfm95();
 }
 
-bool rfClientLoop()
+bool rfClientLoop(uint8_t typeSend)
 {
   //static uint32_t fff = 14167244 - 10000;
   

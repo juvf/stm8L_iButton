@@ -39,6 +39,16 @@ extern uint8_t protection;
 extern uint16_t timerProt;
 extern uint16_t protectPause;
 
+/*
+ * 0 - ни чего не слать
+ * 1 - постановка на охрану
+ * 2 - взятие под охрану
+ * 3 - сработка датчика (ожидание снятия с охраны)
+ * 4 - снятие с охраны
+ * 5 - тревога
+ */
+extern uint8_t sendProtect; //пакет который нужно отправить по охране
+
 void initPeref();
 void checkSleep();
 

@@ -28,6 +28,7 @@ void checkIButton()
 					{
 						case 0: //снято с охраны - ставим
 							timerProt = 10000;
+							sendProtect = 1;
 							protection = 1;
 							break;
 						case 1: //постановка на охрану

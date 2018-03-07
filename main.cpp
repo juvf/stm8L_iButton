@@ -21,6 +21,9 @@ uint8_t iBut = 0; //состояние работы с iButton
 //int offset = -200;
 bool isSacsesfulSend; //если false, то передать следующий пакет не позже чем через час
 uint8_t protection = 0;
+
+uint8_t sendProtect = 0; //пакет который нужно отправить по охране
+
 uint16_t timerProt = 0;//таймер снятия постановки на охрану, мс
 uint16_t protectPause = 0;//защита от дребезга iButton, мс
 
@@ -71,22 +74,19 @@ int main()
 				break;
 		}
 
-		if(isSendLora)
+		//if(isSendLora)
+		if(sendProtect)
 		{
 			while(timeToSleepUart > 0)
 				;
-			//releOn();
-			//while(1)
 			if(enTransmit)
-				isSacsesfulSend = rfClientLoop();
+				isSacsesfulSend = rfClientLoop(sendProtect);
 			else
 				isSacsesfulSend = true;
 			if(periodOprosa)
 				isSendLora = false;
 			else
-				delayMs(100);
-			//releOff();
-			//tik = 0;
+				delayMs(10);
 		}
 		//waitResive();
 		//serial.println(timeOpros);
