@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "eeprom.h"
 #include "iButton.h"
+#include "protect.h"
 
 #include <string.h>
 
@@ -23,14 +24,14 @@ uint8_t iBut = 0; //состояние работы с iButton
 volatile bool isSendLora; //пакет нужно отправить по охране
 uint8_t protection;
 
-uint16_t timerProt = 0;//таймер снятия постановки на охрану, мс
-uint16_t protectPause = 0;//защита от дребезга iButton, мс
+uint16_t timerProt = 0; //таймер снятия постановки на охрану, мс
+uint16_t protectPause = 0; //защита от дребезга iButton, мс
 
 #pragma optimize=none
 int main()
 {
-  isSendLora = true;
-  protection = 0;
+	isSendLora = true;
+	protection = 0;
 	disableInterrupts();
 
 	EEPROM_Unlock();
@@ -54,7 +55,7 @@ int main()
 
 	while(1)
 	{
-		if( iBut )
+		if(iBut)
 			checkIButton();
 		if(isSendLora)
 		{
@@ -62,7 +63,7 @@ int main()
 				;
 			if(enTransmit)
 			{
-				//serial.print("\n\rSend to rf95", true);
+				serial.print("\n\rSend to rf95", true);
 				serial.print("protection = ", false);
 				serial.println(protection);
 				if(jLora.sendPayload(protection))
@@ -76,20 +77,33 @@ int main()
 		{
 			case 0:
 				break;
-			case 1://ставим на охрану
+			case 1: //ставим на охрану
+			  timeToSleep = 1000;
 				if(timerProt == 0)
 				{
 					isSendLora = true;
+					clearProtect();
 					protection = 2;
 				}
 				break;
-			case 4://снимаем с охраны
+			case 4: //снимаем с охраны
 				if(timerProt == 0)
 					protection = 3;
 				break;
 			case 3:
+				protect();
 				break;
-			case 2://охраняем
+			case 2: //охраняем
+				protect();
+				if(getProtect() & 0x3)
+				{
+				  timeToSleep = 1000;
+					if(timerProt == 0)
+					{
+					  isSendLora = true;
+						protection = 3;
+					}
+				}
 				break;
 		}
 
@@ -105,11 +119,14 @@ int main()
 void initPeref()
 {
 	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // Порт управление Led PB_10
-    GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); // Порт 1-Wire на iButton
+	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); // Порт 1-Wire на iButton
 
-    //настроим прерывания
-    EXTI->CR1 = EXTI_Trigger_Rising << 6; //прерывание по переднему фронту для порта PB3 (1-Wire)
+	//настроим прерывания
+	EXTI->CR1 = (EXTI_Trigger_Rising << 6) //прерывание по переднему фронту для порта PB3 (1-Wire)
+	| (EXTI_Trigger_Falling << 2) //прерывание по заднему фронту для порта PB1 (охрана)
+			| (EXTI_Trigger_Falling << 4); //прерывание по заднему фронту для порта PB2 (охрана)
 
+	GPIO_Init(GPIOB, GPIO_Pin_1 | GPIO_Pin_2, GPIO_Mode_In_FL_IT); // PB1 PB2 на прерывание (охрана)
 
 	serial.init();
 	intiTimerJ();
@@ -138,12 +155,12 @@ void checkSleep()
 	serial.flush();
 	delayMs(50); //пауза, чтобы закончил работу уарт;
 	if((timeToSleep == 0) && (timeToSleepUart == 0) && !jLora.rfm95.isSending()
-			&& !serial.isGetCommand() && !isSendLora)
+			&& !serial.isGetCommand() && !isSendLora && (timerProt == 0) && (iBut == 0))
 	{
 		//releOn();
 		jLora.rfm95.setMode(RHModeSleep);
-		//serial.print("\n\rSleep  ", true);
-		//serial.flush();
+		serial.print("\n\rSleep  ", true);
+		serial.flush();
 
 		delayMs(500);
 #ifdef USE_HALT
@@ -157,8 +174,8 @@ void checkSleep()
 		USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
 				| USART_CR2_RIEN;
 #endif
-		//serial.print("wakeup\n\r", true);
-		//serial.flush();
+		serial.print("wakeup\n\r", true);
+		serial.flush();
 		//releOff();
 	}
 }

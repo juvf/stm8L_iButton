@@ -190,7 +190,7 @@
                     <name>CCDefines</name>
                     <state>STM8L05X_LD_VL</state>
                     <state>USE_STDPERIPH_DRIVER</state>
-                    <state>USE_HALT_NO</state>
+                    <state>USE_HALT</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1719,6 +1719,12 @@
     </file>
     <file>
         <name>$PROJ_DIR$\parser42.h</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\protect.cpp</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\protect.h</name>
     </file>
     <file>
         <name>$PROJ_DIR$\rfClient.cpp</name>

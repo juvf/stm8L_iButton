@@ -16,8 +16,8 @@ uint8_t iarray[8];
 #pragma optimize=none
 void checkIButton()
 {
-	//serial.print("i", false);
-	//serial.print(iBut);
+	serial.print("i", false);
+	serial.print(iBut);
 	switch(iBut)
 	{
 		case 1: //сработало, возможно каснулись.
@@ -45,6 +45,7 @@ void checkIButton()
 							protection = 0;
 							isSendLora = true;
 							break;
+						case 3:
 						case 2: //стоит на охране, сняте с охраны
 							protection = 0;
 							timerProt = 1000;

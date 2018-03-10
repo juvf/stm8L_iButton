@@ -12,6 +12,7 @@
 #include "timerJ.h"
 #include "utils.h"
 #include "main.h"
+#include "protect.h"
 
 #include <string.h>
 
@@ -50,7 +51,7 @@ bool JLora::sendPayload(uint8_t protect)
 		array[5] = numPack >> 8;
 		array[6] = 4;
 		array[7] = protect;
-		array[8] = 0; //состояние входов
+		array[8] = getProtect(); //состояние входов
 		array[9] = (uint8_t)config.countStarts; //состояние входов
 
 		Checksum::addCrc16(array, 10);
