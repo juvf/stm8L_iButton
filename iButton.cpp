@@ -16,6 +16,7 @@ uint8_t iarray[8];
 #pragma optimize=none
 void checkIButton()
 {
+	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
 	serial.print("i", false);
 	serial.print(iBut);
 	switch(iBut)

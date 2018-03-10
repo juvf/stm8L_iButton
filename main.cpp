@@ -15,7 +15,7 @@
 
 #include <string.h>
 
-uint8_t timeToSleep = 0;
+uint16_t timeToSleep = 0;
 uint16_t timeToSleepUart = 250;
 volatile uint16_t timeOpros = 0; //счетчик, при достижении которым будет отправка на распбери
 uint8_t iBut = 0; //состояние работы с iButton

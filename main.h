@@ -25,7 +25,7 @@ extern "C"
 #define ledOn()	(PORT_LED->ODR |= PIN_LED)
 #define ledOff()	(PORT_LED->ODR &= ~PIN_LED)
 
-extern uint8_t timeToSleep;
+extern uint16_t timeToSleep;
 extern uint16_t timeToSleepUart;
 
 /*Текущее состояние

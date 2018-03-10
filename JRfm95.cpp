@@ -290,9 +290,14 @@ bool JRfm95::isChannelActive()
 //#pragma optimize=none
 bool JRfm95::send(const uint8_t* data, uint8_t len)
 {
+	//прочитаем частоту
+	uint8_t freq = spi->read(RH_RF95_REG_08_FRF_LSB);
+	serial.print("freq = ", false);
+	serial.println(freq);
 	if(!waitCAD())
 	{
 		setMode(RHModeIdle);
+		serial.print("CAD bag", true);
 		return false;  // Check channel activity
 	}
 
@@ -312,10 +317,12 @@ bool JRfm95::send(const uint8_t* data, uint8_t len)
 	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);	
 	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
 	uint8_t value;
+	serial.print("Start send...", true);
 	do
 	{
 		value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
 	} while((value & RH_RF95_TX_DONE) == 0);
+	serial.print("Stop send.", true);
 	spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 
 	setMode(RHModeIdle);
