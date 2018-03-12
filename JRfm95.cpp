@@ -81,12 +81,12 @@ bool JRfm95::initial()
 		if(power > 17)
 		{
 			//150 mA
-			mA = 0x15| 0x20;
+			mA = 0x15 | 0x20;
 		}
 		else if(power > 14)
-			mA = 0x10| 0x20;//130mA
+			mA = 0x10 | 0x20; //130mA
 		else
-		mA = 0xB | 0x20;//100mA
+			mA = 0xB | 0x20; //100mA
 		spi->write(RH_RF95_REG_0B_OCP, mA);
 
 		if(power > 17)
@@ -97,14 +97,15 @@ bool JRfm95::initial()
 		}
 		else
 		{
-			spi->write(RH_RF95_REG_09_PA_CONFIG, RH_RF95_PA_SELECT |(power - 2));
+			spi->write(RH_RF95_REG_09_PA_CONFIG,
+					RH_RF95_PA_SELECT | (power - 2));
 			spi->write(RH_RF95_REG_4D_PA_DAC, 0x84);
 		}
 	}
 	spi->write(RH_RF95_REG_1D_MODEM_CONFIG1, reg_1d);
 	spi->write(RH_RF95_REG_1E_MODEM_CONFIG2, reg_1e);
 
-spi->write(RH_RF95_REG_41_DIO_MAPPING2, 0x50);
+	spi->write(RH_RF95_REG_41_DIO_MAPPING2, 0x50);
 
 	setPreambleLength(8); // Default is 8
 	return true;
@@ -238,26 +239,6 @@ void JRfm95::setMode(RHMode mode)
 	}
 }
 
-bool JRfm95::waitCAD()
-{
-	if(!_cad_timeout)
-		return true;
-
-// Wait for any channel activity to finish or timeout
-// Sophisticated DCF function...
-// DCF : BackoffTime = random() x aSlotTime
-// 100 - 1000 ms
-// 10 sec timeout
-	unsigned long t = millis();
-	while(isChannelActive())
-	{
-		if(millis() - t > _cad_timeout)
-			return false;
-		delay(millis() % 10 * 100);
-	}
-	return true;
-}
-
 bool JRfm95::isSending()
 {
 	return _mode == RHModeTx;
@@ -272,7 +253,6 @@ bool JRfm95::isChannelActive()
 		spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x80); // Interrupt on CadDone
 		_mode = RHModeCad;
 	}
-
 
 	static uint8_t value;
 	do
@@ -314,7 +294,7 @@ bool JRfm95::send(const uint8_t* data, uint8_t len)
 	for(int i = 0; i < len; i++)
 		spi->write(RH_RF95_REG_00_FIFO, data[i]);
 
-	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);	
+	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
 	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
 	uint8_t value;
 	serial.print("Start send...", true);
@@ -444,5 +424,43 @@ bool JRfm95::reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout)
 		ATOMIC_BLOCK_END
 	;
 	return true;
+}
+
+uint8_t JRfm95::startCad()
+{
+
+// Wait for any channel activity to finish or timeout
+// Sophisticated DCF function...
+// DCF : BackoffTime = random() x aSlotTime
+// 100 - 1000 ms
+// 10 sec timeout
+	unsigned long t = millis();
+	while(isChannelActive())
+	{
+		if(millis() - t > _cad_timeout)
+			return false;
+		delay(millis() % 10 * 100);
+	}
+	return true;
+}
+
+uint8_t JRfm95::waitCad()
+{
+
+}
+
+uint8_t JRfm95::startSend()
+{
+
+}
+
+uint8_t JRfm95::waitSend()
+{
+
+}
+
+uint8_t JRfm95::waitAck()
+{
+
 }
 

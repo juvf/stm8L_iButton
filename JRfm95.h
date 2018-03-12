@@ -33,7 +33,6 @@ public:
 	bool setFrequency(float centre);
 	bool setFrequency(uint8_t chanel);
 	bool send(const uint8_t* data, uint8_t len);
-	bool waitCAD();
 	bool isChannelActive();
 	bool isSending();
 	bool reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout);  
@@ -47,6 +46,12 @@ public:
 	static void isr0();
 	void reset();
 	void setFrequency(uint32_t centre);
+
+	uint8_t waitCad();
+	void startCad();
+	void startSend();
+	uint8_t waitSend();
+	uint8_t waitAck();
 
 private:
 	JSpi *spi;
@@ -86,6 +91,7 @@ private:
 	
 	// True when there is a valid message in the buffer
     volatile bool       _rxBufValid;
+    volatile uint16_t tempTime;
 
 
 };

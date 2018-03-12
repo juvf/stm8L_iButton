@@ -20,40 +20,74 @@ JLora jLora;
 
 void setupRf95()
 {
-/*	serial.print("\n\rStart Program\n\r");
-	serial.flush();
-	serial.print(__DATE__);
-	serial.print("   ");
-	serial.print(__TIME__, true);
-	serial.flush();*/
-	
-	
+	/*	serial.print("\n\rStart Program\n\r");
+	 serial.flush();
+	 serial.print(__DATE__);
+	 serial.print("   ");
+	 serial.print(__TIME__, true);
+	 serial.flush();*/
+
 	bool isOk = jLora.rfm95.initial();
 	if(!isOk)
-	  isOk = jLora.rfm95.initial();
-	
+		isOk = jLora.rfm95.initial();
+
 	if(isOk)
 	{
-	  serial.print(txt_isOk, true);
-	  jLora.rfm95.setFrequency(config.freq);
-	  serial.print("Listening on chanel frequency: ", false);
-	serial.println(config.numChanel);
+		serial.print(txt_isOk, true);
+		jLora.rfm95.setFrequency(config.freq);
+		serial.print("Listening on chanel frequency: ", false);
+		serial.println(config.numChanel);
 	}
 	else
-	  serial.print("init failed", true);
-	serial.flush();	
+		serial.print("init failed", true);
+	serial.flush();
 	//jLora.printRegOfRfm95();
+}
+
+uint8_t stateLora = 0; //0 - нет передачи
+void loraRutine()
+{
+	switch(stateLora)
+	{
+		case 0:
+			if(protection)
+				jLora.startCad();
+				stateLora = 1;
+			break;
+		case 1:
+			stateLora = jLora.waitCad();
+			break;
+		case 2:
+			jLora.startSend(protection);//готовим пакет
+			stateLora = 3;
+			break;
+		case 3:
+			stateLora = jLora.waitSend();//готовим пакет
+			break;
+		case 4://не дождались CAD
+			break;
+		case 5://не было отправки успешной
+			break;
+		case 6://ждем аск
+			stateLora = waitAck();
+			break;
+		case 7://не дождались аск
+			break;
+		case 8://удачная отправка
+			break;
+	}
+
 }
 
 void waitResive()
 {
-	uint8_t buf[32];//RH_RF95_FIFO_SIZE];
+	uint8_t buf[32]; //RH_RF95_FIFO_SIZE];
 	uint8_t len = sizeof(buf);
-	if(0)//jLora.waitAvailableTimeout(100))
+	if(0) //jLora.waitAvailableTimeout(100))
 	{
 		if(jLora.recive(buf, &len))
 		{
-		  serial.print("Got Packed. RSSI: ");
+			serial.print("Got Packed. RSSI: ");
 //			serial.println(rf95.lastRssi(), DEC);
 			parserLoraProtocol(buf, len);
 		}
@@ -70,7 +104,8 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 	{
 		PackJ pack;
 		getPackJ(&pack, buffer);
-		if((pack.dst == config.addressOfModul) && (pack.src == config.addressOfServer))
+		if((pack.dst == config.addressOfModul)
+				&& (pack.src == config.addressOfServer))
 		{
 			switch(pack.type)
 			{
@@ -81,7 +116,7 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 					if(pack.data[0] == 1)
 					{
 						if(pack.data[1])
-						  	PORT_RELE->ODR &= (uint8_t)(~PIN_RELE);
+							PORT_RELE->ODR &= (uint8_t)(~PIN_RELE);
 						else
 							PORT_RELE->ODR |= PIN_RELE;
 					}

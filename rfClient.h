@@ -29,6 +29,7 @@ void setNumChanel(uint8_t val);
 void waitResive();
 void parserLoraProtocol(uint8_t *buffer, uint8_t len);
 void getPackJ(PackJ *pack, uint8_t *buffer);
+void loraRutine();
 
 extern volatile bool isSendLora; //если true, то пора отправлять данные на сервер
 

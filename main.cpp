@@ -66,8 +66,9 @@ int main()
 				serial.print("\n\rSend to rf95", true);
 				serial.print("protection = ", false);
 				serial.println(protection);
-				if(jLora.sendPayload(protection))
-					isSendLora = 0;
+				loraRutine();
+				//if(jLora.sendPayload(protection))
+				//	isSendLora = 0;
 			}
 			else
 				isSendLora = 0;
