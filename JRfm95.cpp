@@ -17,7 +17,6 @@ JRfm95* JRfm95::rfm = 0;
 
 JRfm95::JRfm95()
 {
-	_cad_timeout = CAD_TIMEOUT;
 	_rxBad = 0;
 	rfm = 0;
 	_rxBufValid = false;
@@ -98,7 +97,7 @@ bool JRfm95::initial()
 		else
 		{
 			spi->write(RH_RF95_REG_09_PA_CONFIG,
-					RH_RF95_PA_SELECT | (power - 2));
+			RH_RF95_PA_SELECT | (power - 2));
 			spi->write(RH_RF95_REG_4D_PA_DAC, 0x84);
 		}
 	}
@@ -260,7 +259,7 @@ bool JRfm95::isChannelActive()
 		value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
 		delay(20);
 	} while((value & RH_RF95_CAD_DONE) == 0);
-	_cad = value & RH_RF95_CAD_DETECTED;
+	_cad = (bool)(value & RH_RF95_CAD_DETECTED);
 	spi->write(RH_RF95_REG_12_IRQ_FLAGS,
 	RH_RF95_CAD_DONE | RH_RF95_CAD_DETECTED); // Clear CAD IRQ flags
 	setMode(RHModeIdle);
@@ -428,25 +427,31 @@ bool JRfm95::reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout)
 
 uint8_t JRfm95::startCad()
 {
-
 // Wait for any channel activity to finish or timeout
 // Sophisticated DCF function...
 // DCF : BackoffTime = random() x aSlotTime
 // 100 - 1000 ms
 // 10 sec timeout
-	unsigned long t = millis();
-	while(isChannelActive())
-	{
-		if(millis() - t > _cad_timeout)
-			return false;
-		delay(millis() % 10 * 100);
-	}
-	return true;
+	tempTime1 = millis();
+	tempTime2 = tempTime1;
+	return isChannelActive() ? 2 : 1;
 }
 
 uint8_t JRfm95::waitCad()
 {
-
+	if((millis() - tempTime1) > CAD_TIMEOUT)
+		return 4;
+	if((millis() - tempTime2) > 50)
+	{
+		if(isChannelActive())
+			return 2;
+		else
+		{
+			tempTime2 = millis();
+			tempTime2 = tempTime2 + tempTime2 % 100;
+			return 1;
+		}
+	}
 }
 
 uint8_t JRfm95::startSend()

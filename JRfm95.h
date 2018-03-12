@@ -62,9 +62,6 @@ private:
 	// True if we are using the HF port (779.0 MHz and above)
 //	bool _usingHFport;
 
-	// Channel activity timeout in ms
-	unsigned int _cad_timeout;
-
 	// Channel activity detected
 	volatile bool _cad;
 
@@ -91,9 +88,8 @@ private:
 	
 	// True when there is a valid message in the buffer
     volatile bool       _rxBufValid;
-    volatile uint16_t tempTime;
-
-
+    volatile uint16_t tempTime1;
+    volatile uint16_t tempTime2;
 };
 
 void interruptDio();

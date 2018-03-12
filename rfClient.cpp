@@ -52,31 +52,52 @@ void loraRutine()
 		case 0:
 			if(protection)
 				jLora.startCad();
-				stateLora = 1;
+			stateLora = 1;
 			break;
 		case 1:
 			stateLora = jLora.waitCad();
 			break;
 		case 2:
-			jLora.startSend(protection);//готовим пакет
+		{
+			uint8_t array[12];
+			preparePack(array);
+			jLora.startSend(array, 12); //готовим пакет
 			stateLora = 3;
+		}
 			break;
 		case 3:
-			stateLora = jLora.waitSend();//готовим пакет
+			stateLora = jLora.waitSend(); //готовим пакет
 			break;
-		case 4://не дождались CAD
+		case 4: //не дождались CAD
 			break;
-		case 5://не было отправки успешной
+		case 5: //не было отправки успешной
 			break;
-		case 6://ждем аск
+		case 6: //ждем аск
 			stateLora = waitAck();
 			break;
-		case 7://не дождались аск
+		case 7: //не дождались аск
 			break;
-		case 8://удачная отправка
+		case 8: //удачная отправка
 			break;
 	}
 
+}
+
+void preparePack(uint8_t *array)
+{
+	static uint8_t numPack = 0;
+	++numPack;
+	array[0] = config.addressOfServer;
+	array[1] = config.addressOfServer >> 8;
+	array[2] = config.addressOfModul;
+	array[3] = config.addressOfModul >> 8;
+	array[4] = numPack;
+	array[5] = numPack >> 8;
+	array[6] = 4;
+	array[7] = protect;
+	array[8] = getProtect(); //состояние входов
+	array[9] = (uint8_t)config.countStarts; //счетчик сбросов
+	Checksum::addCrc16(array, 10);
 }
 
 void waitResive()
