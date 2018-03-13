@@ -9,6 +9,7 @@
 
 #define delay(ms)	delayMs(ms)
 #define CAD_TIMEOUT	10000
+#define TX_TIMEOUT	3000
 
 SpiStm8l051 spiStm8l;
 uint8_t ver;
@@ -269,10 +270,6 @@ bool JRfm95::isChannelActive()
 //#pragma optimize=none
 bool JRfm95::send(const uint8_t* data, uint8_t len)
 {
-	//прочитаем частоту
-	uint8_t freq = spi->read(RH_RF95_REG_08_FRF_LSB);
-	serial.print("freq = ", false);
-	serial.println(freq);
 	if(!waitCAD())
 	{
 		setMode(RHModeIdle);
@@ -377,8 +374,7 @@ uint8_t JRfm95::getReg(uint8_t numReg) const
 
 /*
  * получает в аргументах len - максимальное кол-во принимаемых байт(размер буффера buff)
- * возвращает true, если получен пакет. Если таймаут выйдет - вернет false.
- * в len длинна полученного пакета, в buff копируется полученный пакет
+ * timeout в мс
  */
 #pragma optimize=none
 bool JRfm95::reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout)
@@ -432,6 +428,8 @@ uint8_t JRfm95::startCad()
 // DCF : BackoffTime = random() x aSlotTime
 // 100 - 1000 ms
 // 10 sec timeout
+	if(_mode == RHModeSleep)
+		setMode(RHModeIdle);
 	tempTime1 = millis();
 	tempTime2 = tempTime1;
 	return isChannelActive() ? 2 : 1;
@@ -439,6 +437,7 @@ uint8_t JRfm95::startCad()
 
 uint8_t JRfm95::waitCad()
 {
+
 	if((millis() - tempTime1) > CAD_TIMEOUT)
 		return 4;
 	if((millis() - tempTime2) > 50)
@@ -454,14 +453,36 @@ uint8_t JRfm95::waitCad()
 	}
 }
 
-uint8_t JRfm95::startSend()
+uint8_t JRfm95::startSend(uint8_t *data, uint8_t len)
 {
+	if(_mode == RHModeSleep)
+		setMode(RHModeIdle);
 
+	// Position at the beginning of the FIFO
+	spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
+	for(int i = 0; i < len; i++)
+		spi->write(RH_RF95_REG_00_FIFO, data[i]);
+
+	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
+	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
+
+	tempTime1 = millis();
 }
 
 uint8_t JRfm95::waitSend()
 {
+	if((millis() - tempTime1) > TX_TIMEOUT)
+		return 7;
+	uint8_t value;
+	do
+	{
+		value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
+	} while((value & RH_RF95_TX_DONE) == 0);
+	serial.print("Stop send.", true);
+	spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 
+	setMode(RHModeIdle);
+	return true;
 }
 
 uint8_t JRfm95::waitAck()

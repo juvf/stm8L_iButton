@@ -51,17 +51,18 @@ void loraRutine()
 	{
 		case 0:
 			if(protection)
-				jLora.startCad();
+				jLora.rfm95.startCad();
 			stateLora = 1;
 			break;
 		case 1:
-			stateLora = jLora.waitCad();
+			stateLora = jLora.rfm95.waitCad();
 			break;
 		case 2:
 		{
 			uint8_t array[12];
-			preparePack(array);
-			jLora.startSend(array, 12); //готовим пакет
+			preparePack(array);//готовим пакет
+			serial.print("Start send...", true);
+			jLora.startSend(array, 12);
 			stateLora = 3;
 		}
 			break;
