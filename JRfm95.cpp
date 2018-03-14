@@ -453,14 +453,14 @@ uint8_t JRfm95::waitCad()
 	}
 }
 
-uint8_t JRfm95::startSend(uint8_t *data, uint8_t len)
+void JRfm95::startSend(uint8_t *data, uint8_t len)
 {
 	if(_mode == RHModeSleep)
 		setMode(RHModeIdle);
 
 	// Position at the beginning of the FIFO
 	spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
-	for(int i = 0; i < len; i++)
+	for(uint8_t i = 0; i < len; i++)
 		spi->write(RH_RF95_REG_00_FIFO, data[i]);
 
 	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);

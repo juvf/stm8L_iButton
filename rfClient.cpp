@@ -62,7 +62,7 @@ void loraRutine()
 			uint8_t array[12];
 			preparePack(array);//готовим пакет
 			serial.print("Start send...", true);
-			jLora.startSend(array, 12);
+			jLora.rfm95.startSend(array, 12);
 			stateLora = 3;
 		}
 			break;
