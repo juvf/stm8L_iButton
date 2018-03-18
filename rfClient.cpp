@@ -48,41 +48,55 @@ void setupRf95()
 uint8_t stateLora = 0; //0 - нет передачи
 void loraRutine()
 {
+	uint8_t array[12];
+	static uint8_t attempt = 0;
+
+	serial.print("rI", false);
+	serial.print(stateLora);
+
+
 	switch(stateLora)
 	{
+		case 5: //не было отправки успешной
+			if(--attempt > 0)
+			{
+				jLora.rfm95.startCad();
+				stateLora = 1;
+			}
+			else
+				stateLora = 0;
+			break;
 		case 0:
-                  jLora.rfm95.startCad();
-                           stateLora = 1;
+			jLora.rfm95.startCad();
+			attempt = 5;
+			stateLora = 1;
 			break;
 		case 1:
 			stateLora = jLora.rfm95.waitCad();
 			break;
 		case 2:
 		{
-			uint8_t array[12];
-			preparePack(array);//готовим пакет
+			preparePack(array); //готовим пакет
 			serial.print("Start send...", true);
 			jLora.rfm95.startSend(array, 12);
 			stateLora = 3;
 		}
 			break;
 		case 3:
-			stateLora = jLora.rfm95.waitSend(); 
+			stateLora = jLora.rfm95.waitSend(); // ждем отправки
 			break;
 		case 4: //не дождались CAD
-		  	stateLora = 0;//пока ни чего не делаем, просто завершим передачу.
-			break;
-		case 5: //не было отправки успешной
+			stateLora = 0; //пока ни чего не делаем, просто завершим передачу.
 			break;
 		case 6: //ждем аск
-			stateLora = jLora.rfm95.waitAck();
+			stateLora = jLora.rfm95.waitAck(array);
 			break;
-		case 7: //не дождались аск
-			break;
-		case 8: //удачная отправка
+		case 8: //дождались аск
+			stateLora = 0;
 			break;
 	}
-
+	serial.print("rO", false);
+	serial.println(stateLora);
 }
 
 void preparePack(uint8_t *array)

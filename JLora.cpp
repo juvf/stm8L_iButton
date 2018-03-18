@@ -78,7 +78,7 @@ bool JLora::sendPayload(uint8_t protect)
 					//uint16_t pack = WORD_FROM_ARRAY(&array[4]);
 					//uint8_t type = array[6];
 
-					/*serial.print("src= ");
+					/ * serial.print("src= ");
 					serial.println(adr);
 					serial.print("sourc= ");
 					serial.println(sourc);

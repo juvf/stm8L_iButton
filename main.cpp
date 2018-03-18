@@ -70,9 +70,9 @@ int main()
 					serial.print("\n\rSend to rf95", true);
 					serial.print("protection = ", false);
 					serial.println(protection);
-					loraRutine();
 					isSendLora = false;
 				}
+				loraRutine();
 			}
 			else
 				isSendLora = false;
@@ -94,8 +94,12 @@ int main()
 				}
 				break;
 			case 4: //снимаем с охраны
+			  	timeToSleep = 1000;
 				if(timerProt == 0)
+				{
+				  	isSendLora = true;
 					protection = 3;
+				}
 				break;
 			case 3:
 				protect();
@@ -105,11 +109,8 @@ int main()
 				if(getProtect() & 0x3)
 				{
 					timeToSleep = 1000;
-					if(timerProt == 0)
-					{
-						isSendLora = true;
-						protection = 3;
-					}
+					protection = 4;
+					isSendLora = true;
 				}
 				break;
 		}
@@ -167,8 +168,8 @@ void checkSleep()
 	{
 		//releOn();
 		jLora.rfm95.setMode(RHModeSleep);
-		serial.print("\n\rSleep  ", true);
-		serial.flush();
+		//serial.print("\n\rSleep  ", true);
+		//serial.flush();
 
 		delayMs(500);
 #ifdef USE_HALT
@@ -182,8 +183,8 @@ void checkSleep()
 		USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
 		| USART_CR2_RIEN;
 #endif
-		serial.print("wakeup\n\r", true);
-		serial.flush();
+		//serial.print("wakeup\n\r", true);
+		//serial.flush();
 		//releOff();
 	}
 }

@@ -48,6 +48,7 @@ void checkIButton()
 							break;
 						case 3:
 						case 2: //стоит на охране, сняте с охраны
+						case 4:
 							protection = 0;
 							timerProt = 1000;
 							isSendLora = true;

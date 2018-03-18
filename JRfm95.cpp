@@ -10,6 +10,7 @@
 #define delay(ms)	delayMs(ms)
 #define CAD_TIMEOUT	10000
 #define TX_TIMEOUT	3000
+#define RX_TIMEOUT	1000
 
 SpiStm8l051 spiStm8l;
 uint8_t ver;
@@ -212,7 +213,7 @@ void JRfm95::setMode(RHMode mode)
 			if(_mode != RHModeRx)
 			{
 				spi->write(RH_RF95_REG_01_OP_MODE, LORA_RX_MODE); //RH_RF95_MODE_RXCONTINUOUS);
-				spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x00); // Interrupt on RxDone
+				//spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x00); // Interrupt on RxDone
 				_mode = RHModeRx;
 			}
 			break;
@@ -266,41 +267,41 @@ bool JRfm95::isChannelActive()
 }
 //#pragma optimize=none
 /*bool JRfm95::send(const uint8_t* data, uint8_t len)
-{
-	if(!waitCAD())
-	{
-		setMode(RHModeIdle);
-		serial.print("CAD bag", true);
-		return false;  // Check channel activity
-	}
+ {
+ if(!waitCAD())
+ {
+ setMode(RHModeIdle);
+ serial.print("CAD bag", true);
+ return false;  // Check channel activity
+ }
 
-	if(_mode == RHModeSleep)
-		setMode(RHModeIdle);
+ if(_mode == RHModeSleep)
+ setMode(RHModeIdle);
 
-//uint8_t state = spi->read(RH_RF95_REG_01_OP_MODE);
+ //uint8_t state = spi->read(RH_RF95_REG_01_OP_MODE);
 
-//serial.print("optmode = ", false);
-//serial.println(state);
+ //serial.print("optmode = ", false);
+ //serial.println(state);
 
-// Position at the beginning of the FIFO
-	spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
-	for(int i = 0; i < len; i++)
-		spi->write(RH_RF95_REG_00_FIFO, data[i]);
+ // Position at the beginning of the FIFO
+ spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
+ for(int i = 0; i < len; i++)
+ spi->write(RH_RF95_REG_00_FIFO, data[i]);
 
-	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
-	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
-	uint8_t value;
-	serial.print("Start send...", true);
-	do
-	{
-		value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
-	} while((value & RH_RF95_TX_DONE) == 0);
-	serial.print("Stop send.", true);
-	spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
+ spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
+ spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
+ uint8_t value;
+ serial.print("Start send...", true);
+ do
+ {
+ value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
+ } while((value & RH_RF95_TX_DONE) == 0);
+ serial.print("Stop send.", true);
+ spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 
-	setMode(RHModeIdle);
-	return true;
-}*/
+ setMode(RHModeIdle);
+ return true;
+ }*/
 
 void interruptDio()
 {
@@ -439,7 +440,7 @@ uint8_t JRfm95::waitCad()
 		return 4;
 	if((millis() - tempTime2) > paus)
 	{
-		if(!isChannelActive())//проверим, чтоб не было активности в канале
+		if(!isChannelActive())		//проверим, чтоб не было активности в канале
 			return 2;
 		else
 		{
@@ -462,28 +463,68 @@ void JRfm95::startSend(uint8_t *data, uint8_t len)
 
 	spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
 	spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
-
+	_mode = RHModeTx;
 	tempTime1 = millis();
 }
 
 uint8_t JRfm95::waitSend()
 {
 	if((millis() - tempTime1) > TX_TIMEOUT)
-		return 7;
-	uint8_t value;
-	do
 	{
-		value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
-	} while((value & RH_RF95_TX_DONE) == 0);
-	serial.print("Stop send.", true);
-	spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
-
-	setMode(RHModeIdle);
-	return true;
+		setMode(RHModeIdle);
+		return 5;
+	}
+	uint8_t value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
+	if((value & RH_RF95_TX_DONE) != 0)
+	{
+		serial.print("Stop send.", true);
+		spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
+		setMode(RHModeIdle);
+		setMode(RHModeRx);
+			tempTime1 = millis();
+		return 6;
+	}
+	return 3;
 }
 
-uint8_t JRfm95::waitAck()
+uint8_t JRfm95::waitAck(uint8_t *array)
 {
+	if((millis() - tempTime1) > RX_TIMEOUT)
+	{
+		setMode(RHModeIdle);
+		return 5;
+	}
+	uint8_t value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
+	if(value & RH_RF95_RX_DONE)
+	{
+		setMode(RHModeIdle);
+		uint8_t localLen = spi->read(RH_RF95_REG_13_RX_NB_BYTES);
 
+		if(localLen != 9)
+		{ //гавно приняли
+			return 7;
+		}
+		spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR,
+				spi->read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)); // Reset the fifo read ptr to the beginning of the packet
+		spi->read(RH_RF95_REG_00_FIFO, array, 9);
+
+		spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
+
+		_lastSNR = (int8_t)spi->read(RH_RF95_REG_19_PKT_SNR_VALUE) / 4;
+
+		// Remember the RSSI of this packet, LORA mode
+		// this is according to the doc, but is it really correct?
+		// weakest receiveable signals are reported RSSI at about -66
+		_lastRssi = spi->read(RH_RF95_REG_1A_PKT_RSSI_VALUE);
+		// Adjust the RSSI, datasheet page 87
+		if(_lastSNR < 0)
+			_lastRssi = _lastRssi + _lastSNR;
+		else
+			_lastRssi = (int)_lastRssi * 16 / 15;
+		//if(_usingHFport)
+		_lastRssi -= 157;
+		return 8;
+	}
+	return 6;
 }
 

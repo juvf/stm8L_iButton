@@ -10,14 +10,14 @@
 #define PIN_PROTECT_2 GPIO_Pin_2 //вход охрана 2
 
 uint8_t oldState[2];
-
+#pragma optimize=none
 void protect()
 {
 	if((GPIOB->IDR & PIN_PROTECT_1) == 0) //порт 1 сработал
 	{
 		if(oldState[0] == 0)
 		{
-			if(protection == 2)
+			if((protection == 2) || (protection == 4))
 			{
 				if(timerProt == 0)
 					timerProt = 10000;
@@ -27,11 +27,11 @@ void protect()
 		}
 	}
 
-	if((GPIOB->IDR & PIN_PROTECT_2) == 0) //порт 1 сработал
+	if((GPIOB->IDR & PIN_PROTECT_2) == 0) //порт 2 сработал
 	{
 		if(oldState[1] == 0)
 		{
-			if(protection == 2)
+			if( (protection == 2) || (protection == 4))
 			{
 				if(timerProt == 0)
 					timerProt = 10000;

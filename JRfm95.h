@@ -51,7 +51,7 @@ public:
 	uint8_t startCad();
 	void startSend(uint8_t *data, uint8_t len);
 	uint8_t waitSend();
-	uint8_t waitAck();
+	uint8_t waitAck(uint8_t *array);
 
 private:
 	JSpi *spi;
