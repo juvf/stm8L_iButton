@@ -8,6 +8,7 @@
 #include "eeprom.h"
 #include "varInEeprom.h"
 #include "utils.h"
+#include "protect.h"
 
 #include <string.h>
 
@@ -50,9 +51,8 @@ void loraRutine()
 	switch(stateLora)
 	{
 		case 0:
-			if(protection)
-				jLora.rfm95.startCad();
-			stateLora = 1;
+                  jLora.rfm95.startCad();
+                           stateLora = 1;
 			break;
 		case 1:
 			stateLora = jLora.rfm95.waitCad();
@@ -67,14 +67,15 @@ void loraRutine()
 		}
 			break;
 		case 3:
-			stateLora = jLora.waitSend(); //готовим пакет
+			stateLora = jLora.rfm95.waitSend(); 
 			break;
 		case 4: //не дождались CAD
+		  	stateLora = 0;//пока ни чего не делаем, просто завершим передачу.
 			break;
 		case 5: //не было отправки успешной
 			break;
 		case 6: //ждем аск
-			stateLora = waitAck();
+			stateLora = jLora.rfm95.waitAck();
 			break;
 		case 7: //не дождались аск
 			break;
@@ -95,7 +96,7 @@ void preparePack(uint8_t *array)
 	array[4] = numPack;
 	array[5] = numPack >> 8;
 	array[6] = 4;
-	array[7] = protect;
+	array[7] = protection;
 	array[8] = getProtect(); //состояние входов
 	array[9] = (uint8_t)config.countStarts; //счетчик сбросов
 	Checksum::addCrc16(array, 10);

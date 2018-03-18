@@ -34,6 +34,7 @@ void JLora::printRegOfRfm95()
 		serial.flush();
 	}
 }
+/*
 #pragma optimize=none
 bool JLora::sendPayload(uint8_t protect)
 {
@@ -86,7 +87,7 @@ bool JLora::sendPayload(uint8_t protect)
 					serial.print("type= ");
 					serial.println(type);*/
 
-					if(((WORD_FROM_ARRAY(&array[0])) == config.addressOfModul)
+/*					if(((WORD_FROM_ARRAY(&array[0])) == config.addressOfModul)
 							&& (WORD_FROM_ARRAY(&array[2])
 									== config.addressOfServer)
 							&& (WORD_FROM_ARRAY(&array[4]) == numPack)
@@ -102,6 +103,7 @@ bool JLora::sendPayload(uint8_t protect)
 	} while(--attempt > 0);
 	return false;
 }
+*/
 
 bool JLora::waitAvailableTimeout(uint16_t timeout)
 {

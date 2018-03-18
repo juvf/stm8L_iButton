@@ -1,4 +1,5 @@
 //Программа для модуля на STM8L051, проект Альтиума voda_stm8l_1
+//Охранный модуль
 
 #include "stm8l15x.h"
 #include "eeprom.h"
@@ -23,6 +24,7 @@ uint8_t iBut = 0; //состояние работы с iButton
 
 volatile bool isSendLora; //пакет нужно отправить по охране
 uint8_t protection;
+extern uint8_t stateLora;
 
 uint16_t timerProt = 0; //таймер снятия постановки на охрану, мс
 uint16_t protectPause = 0; //защита от дребезга iButton, мс
@@ -63,23 +65,27 @@ int main()
 				;
 			if(enTransmit)
 			{
-				serial.print("\n\rSend to rf95", true);
-				serial.print("protection = ", false);
-				serial.println(protection);
-				loraRutine();
-				//if(jLora.sendPayload(protection))
-				//	isSendLora = 0;
+				if(stateLora == 0)
+				{
+					serial.print("\n\rSend to rf95", true);
+					serial.print("protection = ", false);
+					serial.println(protection);
+					loraRutine();
+					isSendLora = false;
+				}
 			}
 			else
-				isSendLora = 0;
+				isSendLora = false;
 		}
+		else if(stateLora != 0)
+			loraRutine();
 
 		switch(protection)
 		{
 			case 0:
 				break;
 			case 1: //ставим на охрану
-			  timeToSleep = 1000;
+				timeToSleep = 1000;
 				if(timerProt == 0)
 				{
 					isSendLora = true;
@@ -98,10 +104,10 @@ int main()
 				protect();
 				if(getProtect() & 0x3)
 				{
-				  timeToSleep = 1000;
+					timeToSleep = 1000;
 					if(timerProt == 0)
 					{
-					  isSendLora = true;
+						isSendLora = true;
 						protection = 3;
 					}
 				}
@@ -155,8 +161,9 @@ void checkSleep()
 {
 	serial.flush();
 	delayMs(50); //пауза, чтобы закончил работу уарт;
-	if((timeToSleep == 0) && (timeToSleepUart == 0) && !jLora.rfm95.isSending()
-			&& !serial.isGetCommand() && !isSendLora && (timerProt == 0) && (iBut == 0))
+	if((timeToSleep == 0) && (timeToSleepUart == 0) && (stateLora == 0)
+			&& !serial.isGetCommand() && !isSendLora && (timerProt == 0)
+			&& (iBut == 0))
 	{
 		//releOn();
 		jLora.rfm95.setMode(RHModeSleep);
@@ -173,7 +180,7 @@ void checkSleep()
 
 		GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
 		USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
-				| USART_CR2_RIEN;
+		| USART_CR2_RIEN;
 #endif
 		serial.print("wakeup\n\r", true);
 		serial.flush();

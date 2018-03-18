@@ -32,7 +32,7 @@ public:
 	void setMode(RHMode mode);
 	bool setFrequency(float centre);
 	bool setFrequency(uint8_t chanel);
-	bool send(const uint8_t* data, uint8_t len);
+	//bool send(const uint8_t* data, uint8_t len);
 	bool isChannelActive();
 	bool isSending();
 	bool reciveWithTimeout(uint8_t *buff, uint8_t *len, uint16_t timeout);  
@@ -48,8 +48,8 @@ public:
 	void setFrequency(uint32_t centre);
 
 	uint8_t waitCad();
-	void startCad();
-	void startSend();
+	uint8_t startCad();
+	void startSend(uint8_t *data, uint8_t len);
 	uint8_t waitSend();
 	uint8_t waitAck();
 

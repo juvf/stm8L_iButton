@@ -250,10 +250,8 @@ bool JRfm95::isChannelActive()
 	if(_mode != RHModeCad)
 	{
 		spi->write(RH_RF95_REG_01_OP_MODE, RH_RF95_MODE_CAD);
-		spi->write(RH_RF95_REG_40_DIO_MAPPING1, 0x80); // Interrupt on CadDone
 		_mode = RHModeCad;
 	}
-
 	static uint8_t value;
 	do
 	{
@@ -264,11 +262,10 @@ bool JRfm95::isChannelActive()
 	spi->write(RH_RF95_REG_12_IRQ_FLAGS,
 	RH_RF95_CAD_DONE | RH_RF95_CAD_DETECTED); // Clear CAD IRQ flags
 	setMode(RHModeIdle);
-
 	return _cad;
 }
 //#pragma optimize=none
-bool JRfm95::send(const uint8_t* data, uint8_t len)
+/*bool JRfm95::send(const uint8_t* data, uint8_t len)
 {
 	if(!waitCAD())
 	{
@@ -303,7 +300,7 @@ bool JRfm95::send(const uint8_t* data, uint8_t len)
 
 	setMode(RHModeIdle);
 	return true;
-}
+}*/
 
 void interruptDio()
 {
@@ -437,20 +434,20 @@ uint8_t JRfm95::startCad()
 
 uint8_t JRfm95::waitCad()
 {
-
+	static uint8_t paus = 50;
 	if((millis() - tempTime1) > CAD_TIMEOUT)
 		return 4;
-	if((millis() - tempTime2) > 50)
+	if((millis() - tempTime2) > paus)
 	{
-		if(isChannelActive())
+		if(!isChannelActive())//проверим, чтоб не было активности в канале
 			return 2;
 		else
 		{
 			tempTime2 = millis();
-			tempTime2 = tempTime2 + tempTime2 % 100;
-			return 1;
+			paus = tempTime2 % 80;
 		}
 	}
+	return 1;
 }
 
 void JRfm95::startSend(uint8_t *data, uint8_t len)
