@@ -17,8 +17,8 @@ uint8_t iarray[8];
 void checkIButton()
 {
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
-	serial.print("i", false);
-	serial.print(iBut);
+	//serial.print("i", false);
+	//serial.print(iBut);
 	switch(iBut)
 	{
 		case 1: //сработало, возможно каснулись.
@@ -29,7 +29,12 @@ void checkIButton()
 		{
 			if(readKey())
 			{ //прислонили ключ
-				if(keyIsGood())
+				if(isReadingKey)
+				{
+					keyIsReaded = true;
+					iBut = 7;
+				}
+				else if(keyIsGood())
 				{
 					disableInterrupts();
 					//меняем состояние охрана/снято

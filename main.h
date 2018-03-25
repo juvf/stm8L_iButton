@@ -40,6 +40,10 @@ extern uint16_t timerProt;
 extern uint16_t protectPause;
 
 extern volatile bool isSendLora; //пакет который нужно отправить по охране
+extern volatile bool isReadingKey; //получен запрос на чтение нового ключа
+extern volatile bool keyIsReaded; //ключ прочитан
+extern uint16_t timerReadKye; //таймер для чтения нового ключа
+
 
 void initPeref();
 void checkSleep();

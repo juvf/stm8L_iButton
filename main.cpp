@@ -23,6 +23,9 @@ uint8_t iBut = 0; //состояние работы с iButton
 //int offset = -200;
 
 volatile bool isSendLora; //пакет нужно отправить по охране
+volatile bool isReadingKey; //получен запрос на чтение нового ключа
+volatile bool keyIsReaded; //ключ прочитан
+uint16_t timerReadKye; //таймер для чтения нового ключа
 uint8_t protection;
 extern uint8_t stateLora;
 
@@ -118,6 +121,7 @@ int main()
 		//waitResive();
 		//serial.println(timeOpros);
 		//serial.print(".");
+		checkReadKey();
 		if(serial.isGetCommand())
 			sendReplay();
 		checkSleep();

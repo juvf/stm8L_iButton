@@ -14,6 +14,7 @@
 #include "JLora.h"
 #include "varInEeprom.h"
 #include "utils.h"
+#include "timerJ.h"
 #include <string.h>
 
 extern JLora jLora;
@@ -127,6 +128,14 @@ void parser42(uint8_t *buffer)
 				buffer[4 + i] = FLASH_ReadByte(adr++);
 			buffer[2] = len + 6;
 		}
+			break;
+		case L_ReadKey://получили запрос на чтение ключа
+			isReadingKey = true;
+			keyIsReaded = false;
+			timerReadKye = millis();
+			timerProt = 10000;
+			buffer[4] = 1;//тип 1 - старт чтения ключа
+			buffer[2] = 7;
 			break;
 	}
 	buffer[0] = 0x19;
