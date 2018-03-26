@@ -8,8 +8,9 @@
 #include "timerJ.h"
 #include "main.h"
 #include "Serial.h"
+#include "varInEeprom.h"
 
-const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
+//const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
 extern uint8_t iBut;
 uint8_t iarray[8];
@@ -90,10 +91,24 @@ void checkIButton()
 
 bool keyIsGood()
 {
-	for(uint8_t i = 0; i < 6; i++)
-		if(iarray[i + 1] != goodKey[i])
-			return false;
-	return true;
+	for(uint8_t j = 0; j < 5; j++)
+	{
+		if(config.flags | (1 << j))
+		{
+			bool result = true;
+			for(uint8_t i = 0; i < 6; i++)
+			{
+				if(iarray[i + 1] != config.iButton[j][i])
+				{
+					result = false;
+					break;
+				}
+			}
+			if(result)
+				return true;
+		}
+	}
+	return false;
 }
 
 bool readKey()
