@@ -32,7 +32,7 @@ extern uint8_t stateLora;
 uint16_t timerProt = 0; //таймер снятия постановки на охрану, мс
 uint16_t protectPause = 0; //защита от дребезга iButton, мс
 
-#pragma optimize=none
+//#pragma optimize=none
 int main()
 {
 	isSendLora = true;

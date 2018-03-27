@@ -116,10 +116,8 @@ bool readKey()
 	delayMs(2);
 	if(GPIOB->IDR & GPIO_Pin_3)
 	{
-		//записывем команду
-
 		OWReadKey();
-		static uint8_t y = iButtonCrc();
+		uint8_t y = iButtonCrc();
 		if((y == 0) && (iarray[0] == 1))
 			return true;
 	}

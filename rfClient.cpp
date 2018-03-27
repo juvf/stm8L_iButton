@@ -68,7 +68,7 @@ void loraRutine()
 			break;
 		case 0:
 			jLora.rfm95.startCad();
-			attempt = 5;
+			attempt = 10;
 			stateLora = 1;
 			break;
 		case 1:
