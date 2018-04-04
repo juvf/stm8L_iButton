@@ -99,6 +99,9 @@ void loraRutine()
 	serial.println(stateLora);
 }
 
+/*
+ * подготовка пакета к отправке. Заполняется шапка пакета
+ */
 void preparePack(uint8_t *array)
 {
 	static uint8_t numPack = 0;
@@ -116,25 +119,29 @@ void preparePack(uint8_t *array)
 	Checksum::addCrc16(array, 10);
 }
 
-void waitResive()
-{
-	uint8_t buf[32]; //RH_RF95_FIFO_SIZE];
-	uint8_t len = sizeof(buf);
-	if(0) //jLora.waitAvailableTimeout(100))
-	{
-		if(jLora.recive(buf, &len))
-		{
-			serial.print("Got Packed. RSSI: ");
-//			serial.println(rf95.lastRssi(), DEC);
-			parserLoraProtocol(buf, len);
-		}
-		//else
-		{
-			//serial.println("recv failed");
-		}
-	}
-}
+//void waitResive()
+//{
+//	uint8_t buf[32]; //RH_RF95_FIFO_SIZE];
+//	uint8_t len = sizeof(buf);
+//	if(0) //jLora.waitAvailableTimeout(100))
+//	{
+//		if(jLora.recive(buf, &len))
+//		{
+//			serial.print("Got Packed. RSSI: ");
+////			serial.println(rf95.lastRssi(), DEC);
+//			parserLoraProtocol(buf, len);
+//		}
+//		//else
+//		{
+//			//serial.println("recv failed");
+//		}
+//	}
+//}
 
+/*
+ * при получении команды по лоре команда обрабатывается и исполняется
+ * в этом парсере
+ */
 void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 {
 	if(Checksum::crc16(buffer, len) == 0)
@@ -163,7 +170,10 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 		}
 	}
 }
-
+/*
+ * Функция получает пакет PackJ из массива данных buffer
+ * и помещает его по указателю pack
+ */
 void getPackJ(PackJ *pack, uint8_t *buffer)
 {
 	pack->dst = buffer[0] | (buffer[1] << 8);

@@ -22,11 +22,9 @@ class JLora
 public:
 
 	JLora();
-
-	//bool sendPayload(uint8_t protect);
-	bool waitAvailableTimeout(uint16_t timeout);
+	//bool waitAvailableTimeout(uint16_t timeout);
 	void printRegOfRfm95();
-	bool recive(uint8_t* buf, uint8_t* len);
+	//bool recive(uint8_t* buf, uint8_t* len);
 	
 	JRfm95 rfm95;
 

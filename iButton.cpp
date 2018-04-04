@@ -12,7 +12,7 @@
 
 //const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
-extern uint8_t iBut;
+extern uint8_t iBut;//состояние работы считывателя iButton
 uint8_t iarray[8];
 #pragma optimize=none
 void checkIButton()
@@ -89,6 +89,10 @@ void checkIButton()
 	}
 }
 
+/*
+ * Проверка хороший ключ или нет. Если код ключа в временном массиве iarray
+ * есть в списке разрешённых, то возвращаем true, иначе false
+ */
 bool keyIsGood()
 {
 	for(uint8_t j = 0; j < 5; j++)
@@ -111,6 +115,11 @@ bool keyIsGood()
 	return false;
 }
 
+/*
+ * Чтение кода ключа в массив  iarray[]
+ * После прочтения проверка CRC.
+ * Если удачно прочитан и CRC совпало, то возвращаем true, иначе false
+ */
 bool readKey()
 {
 	delayMs(2);
@@ -124,6 +133,9 @@ bool readKey()
 	return false;
 }
 
+/*
+ * запись байта на шину 1-Wire
+ */
 #pragma optimize=none
 void OWWriteByte(uint8_t byte)
 {
@@ -150,6 +162,10 @@ void OWWriteByte(uint8_t byte)
 	}
 	enableInterrupts();
 }
+
+/*
+ * Чтение одного байта с шины 1-Wire
+ */
 #pragma optimize=none
 void OWReadKey()
 {
@@ -202,6 +218,10 @@ void OWReadKey()
 	}
 }
 
+
+/*
+ * Подсчет CRC пор алгоритму для iButton
+ */
 uint8_t iButtonCrc()
 {
 	uint8_t crc = 0;

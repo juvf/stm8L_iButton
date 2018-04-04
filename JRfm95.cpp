@@ -265,44 +265,6 @@ bool JRfm95::isChannelActive()
 	setMode(RHModeIdle);
 	return _cad;
 }
-//#pragma optimize=none
-/*bool JRfm95::send(const uint8_t* data, uint8_t len)
- {
- if(!waitCAD())
- {
- setMode(RHModeIdle);
- serial.print("CAD bag", true);
- return false;  // Check channel activity
- }
-
- if(_mode == RHModeSleep)
- setMode(RHModeIdle);
-
- //uint8_t state = spi->read(RH_RF95_REG_01_OP_MODE);
-
- //serial.print("optmode = ", false);
- //serial.println(state);
-
- // Position at the beginning of the FIFO
- spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
- for(int i = 0; i < len; i++)
- spi->write(RH_RF95_REG_00_FIFO, data[i]);
-
- spi->write(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
- spi->write(RH_RF95_REG_01_OP_MODE, LORA_TX_MODE);
- uint8_t value;
- serial.print("Start send...", true);
- do
- {
- value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
- } while((value & RH_RF95_TX_DONE) == 0);
- serial.print("Stop send.", true);
- spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
-
- setMode(RHModeIdle);
- return true;
- }*/
-
 void interruptDio()
 {
 	JRfm95::isr0();
