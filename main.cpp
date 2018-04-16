@@ -26,8 +26,8 @@ volatile bool isSendLora; //пакет нужно отправить по охране
 volatile bool isReadingKey; //получен запрос на чтение нового ключа
 volatile bool keyIsReaded; //ключ прочитан
 uint16_t timerReadKye; //таймер для чтения нового ключа
-uint8_t protection;
-extern uint8_t stateLora;
+uint8_t protection; //текущее состояние охраны
+extern uint8_t stateLora; //текущее состояние передачи по lora
 
 uint16_t timerProt = 0; //таймер снятия постановки на охрану, мс
 uint16_t protectPause = 0; //защита от дребезга iButton, мс
@@ -104,7 +104,7 @@ int main()
 					protection = 3;
 				}
 				break;
-			case 3:
+			case 3://тревога
 				protect();
 				break;
 			case 2: //охраняем

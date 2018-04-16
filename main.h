@@ -28,7 +28,7 @@ extern "C"
 extern uint16_t timeToSleep;
 extern uint16_t timeToSleepUart;
 
-/*“екущее состо€ние
+/*“екущее состо€ние охраны
  * 0 - сн€то с охраны
  * 1 - постановка на охрану
  * 2 - стоит на охране
