@@ -51,8 +51,8 @@ void loraRutine()
 	uint8_t array[12];
 	static uint8_t attempt = 0;
 
-	serial.print("rI", false);
-	serial.print(stateLora);
+	//serial.print("rI", false);
+	//serial.print(stateLora);
 
 
 	switch(stateLora)
@@ -95,8 +95,8 @@ void loraRutine()
 			stateLora = 0;
 			break;
 	}
-	serial.print("rO", false);
-	serial.println(stateLora);
+	//serial.print("rO", false);
+	//serial.println(stateLora);
 }
 
 /*
