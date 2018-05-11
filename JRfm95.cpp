@@ -107,6 +107,8 @@ bool JRfm95::initial()
 	spi->write(RH_RF95_REG_1E_MODEM_CONFIG2, reg_1e);
 
 	spi->write(RH_RF95_REG_41_DIO_MAPPING2, 0x50);
+	
+	spi->write(RH_RF95_REG_39_SYNC_WORD, 0x34); //    Value 0x34 is reserved for LoRaWAN networks
 
 	setPreambleLength(8); // Default is 8
 	return true;
