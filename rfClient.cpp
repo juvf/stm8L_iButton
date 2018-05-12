@@ -69,6 +69,7 @@ void loraRutine()
 		case 0:
 			jLora.rfm95.startCad();
 			attempt = 10;
+			++numPack;
 			stateLora = 1;
 			break;
 		case 1:
@@ -77,7 +78,8 @@ void loraRutine()
 		case 2:
 		{
 			preparePack(array); //готовим пакет
-			serial.print("Start send...", true);
+			serial.print("Start send p=", false);
+			serial.println(numPack);
 			jLora.rfm95.startSend(array, 12);
 			stateLora = 3;
 		}
@@ -90,6 +92,8 @@ void loraRutine()
 			break;
 		case 6: //ждем аск
 			stateLora = jLora.rfm95.waitAck(array);
+			if(stateLora == 8)
+				serial.print("Recive Ask", true);
 			break;
 		case 8: //дождались аск
 			stateLora = 0;
@@ -104,8 +108,6 @@ void loraRutine()
  */
 void preparePack(uint8_t *array)
 {
-	static uint8_t numPack = 0;
-	++numPack;
 	array[0] = config.addressOfServer;
 	array[1] = config.addressOfServer >> 8;
 	array[2] = config.addressOfModul;

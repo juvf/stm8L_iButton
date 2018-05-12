@@ -27,7 +27,7 @@ void protect()
 		}
 	}
 
-	if((GPIOB->IDR & PIN_PROTECT_2) == 0) //порт 2 сработал
+	if((GPIOB->IDR & PIN_PROTECT_2) == 1) //порт 2 сработал
 	{
 		if(oldState[1] == 0)
 		{

@@ -31,6 +31,7 @@ extern uint8_t stateLora; //текущее состо€ние передачи по lora
 
 uint16_t timerProt = 0; //таймер сн€ти€ постановки на охрану, мс
 uint16_t protectPause = 0; //защита от дребезга iButton, мс
+uint16_t numPack;
 
 //#pragma optimize=none
 int main()
@@ -39,9 +40,6 @@ int main()
 	protection = 0;
 	disableInterrupts();
 
-	EEPROM_Unlock();
-	config.countStarts++;
-	EEPROM_Lock();
 	initPeref();
 	ledOn();
 	bool enTransmit = (config.isProgramm == 0x55);
@@ -50,6 +48,10 @@ int main()
 		periodOprosa = config.periodOprosa;
 	else
 		periodOprosa = 0xffff;
+
+	EEPROM_Unlock();
+	config.countStarts++;
+	EEPROM_Lock();
 
 	delayMs(1000);
 	ledOff();
@@ -130,13 +132,13 @@ int main()
 
 void initPeref()
 {
-	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // ѕорт управление Led PB_10
+	GPIO_Init(PORT_LED, PIN_LED, GPIO_Mode_Out_PP_Low_Slow); // ѕорт управление Led PB_0
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); // ѕорт 1-Wire на iButton
 
 	//настроим прерывани€
 	EXTI->CR1 = (EXTI_Trigger_Rising << 6) //прерывание по переднему фронту дл€ порта PB3 (1-Wire)
 	| (EXTI_Trigger_Falling << 2) //прерывание по заднему фронту дл€ порта PB1 (охрана)
-			| (EXTI_Trigger_Falling << 4); //прерывание по заднему фронту дл€ порта PB2 (охрана)
+			| (EXTI_Trigger_Rising << 4); //прерывание по заднему фронту дл€ порта PB2 (охрана)
 
 	GPIO_Init(GPIOB, GPIO_Pin_1 | GPIO_Pin_2, GPIO_Mode_In_FL_IT); // PB1 PB2 на прерывание (охрана)
 
@@ -148,7 +150,7 @@ void initPeref()
 	//неиспользуемые пины
 	GPIO_Init(GPIOA, GPIO_Pin_1 | GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); //GPIO_Mode_In_PU_No_IT
 	GPIO_Init(GPIOC, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT);
-	GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); //initial interupt port for Rfm95 Rising
+	GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); 
 
 	enableInterrupts();
 

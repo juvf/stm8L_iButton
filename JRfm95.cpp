@@ -10,7 +10,7 @@
 #define delay(ms)	delayMs(ms)
 #define CAD_TIMEOUT	10000
 #define TX_TIMEOUT	3000
-#define RX_TIMEOUT	1000
+#define RX_TIMEOUT	3000
 
 SpiStm8l051 spiStm8l;
 uint8_t ver;
@@ -108,7 +108,7 @@ bool JRfm95::initial()
 
 	spi->write(RH_RF95_REG_41_DIO_MAPPING2, 0x50);
 	
-	spi->write(RH_RF95_REG_39_SYNC_WORD, 0x34); //    Value 0x34 is reserved for LoRaWAN networks
+	spi->write(RH_RF95_REG_39_SYNC_WORD, 0x12); //    Value 0x34 is reserved for LoRaWAN networks
 
 	setPreambleLength(8); // Default is 8
 	return true;
@@ -438,6 +438,9 @@ uint8_t JRfm95::waitSend()
 		setMode(RHModeIdle);
 		return 5;
 	}
+	serial.print("mode ", false);
+	serial.println(_mode);
+
 	uint8_t value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
 	if((value & RH_RF95_TX_DONE) != 0)
 	{
@@ -445,7 +448,7 @@ uint8_t JRfm95::waitSend()
 		spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
 		setMode(RHModeIdle);
 		setMode(RHModeRx);
-			tempTime1 = millis();
+		tempTime1 = millis();
 		return 6;
 	}
 	return 3;
@@ -458,6 +461,7 @@ uint8_t JRfm95::waitAck(uint8_t *array)
 		setMode(RHModeIdle);
 		return 5;
 	}
+	
 	uint8_t value = spi->read(RH_RF95_REG_12_IRQ_FLAGS);
 	if(value & RH_RF95_RX_DONE)
 	{
@@ -465,9 +469,7 @@ uint8_t JRfm95::waitAck(uint8_t *array)
 		uint8_t localLen = spi->read(RH_RF95_REG_13_RX_NB_BYTES);
 
 		if(localLen != 9)
-		{ //гавно приняли
-			return 7;
-		}
+			return 7;//гавно приняли
 		spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR,
 				spi->read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)); // Reset the fifo read ptr to the beginning of the packet
 		spi->read(RH_RF95_REG_00_FIFO, array, 9);

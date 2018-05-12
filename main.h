@@ -44,6 +44,8 @@ extern volatile bool isReadingKey; //получен запрос на чтение нового ключа
 extern volatile bool keyIsReaded; //ключ прочитан
 extern uint16_t timerReadKye; //таймер для чтения нового ключа
 
+extern uint16_t numPack; //номер пакета. Для защиты от повторных отправок из шлюза в БД
+
 
 void initPeref();
 void checkSleep();

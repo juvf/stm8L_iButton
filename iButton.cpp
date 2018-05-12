@@ -18,8 +18,8 @@ uint8_t iarray[8];
 void checkIButton()
 {
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
-	//serial.print("i", false);
-	//serial.print(iBut);
+	serial.print("i", false);
+	serial.print(iBut);
 	switch(iBut)
 	{
 		case 1: //сработало, возможно каснулись.
@@ -62,7 +62,7 @@ void checkIButton()
 					}
 					iBut = 7;
 					protectPause = 1000;
-					serial.print("pp", false);
+					serial.print("p!", false);
 					enableInterrupts();
 				}
 			}
