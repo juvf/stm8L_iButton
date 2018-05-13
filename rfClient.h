@@ -31,6 +31,7 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len);
 void getPackJ(PackJ *pack, uint8_t *buffer);
 void loraRutine();
 void preparePack(uint8_t *array);
+bool isGoodAsk(uint8_t *array);
 
 extern volatile bool isSendLora; //если true, то пора отправлять данные на сервер
 

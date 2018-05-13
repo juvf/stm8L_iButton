@@ -67,6 +67,7 @@ void loraRutine()
 				stateLora = 0;
 			break;
 		case 0:
+			setupRf95();
 			jLora.rfm95.startCad();
 			attempt = 10;
 			++numPack;
@@ -88,19 +89,37 @@ void loraRutine()
 			stateLora = jLora.rfm95.waitSend(); // ждем отправки
 			break;
 		case 4: //не дождались CAD
-			stateLora = 0; //пока ни чего не делаем, просто завершим передачу.
+			stateLora = 5; //повторим попытку
 			break;
 		case 6: //ждем аск
 			stateLora = jLora.rfm95.waitAck(array);
 			if(stateLora == 8)
 				serial.print("Recive Ask", true);
 			break;
-		case 8: //дождались аск
-			stateLora = 0;
+		case 8: //дождались аск, проверим - тот аск?
+			stateLora = isGoodAsk(array) ? 0 : 5;
 			break;
 	}
 	//serial.print("rO", false);
 	//serial.println(stateLora);
+}
+
+bool isGoodAsk(uint8_t *array)
+{
+	if(Checksum::crc16(array, 9) != 0)
+		return false;
+
+	uint16_t adrDst = (array[1]<<8) | array[0];//проверим адрес получателя
+	if(adrDst != config.addressOfModul)
+		return false;
+
+	if(array[6] != 4) //проверим тип пакета
+		return false;
+
+	uint16_t numP = (array[5]<<8) | array[4];//провекрим номер пакета
+	if(numP != numPack)
+		return false;
+	return true;
 }
 
 /*

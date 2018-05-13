@@ -469,7 +469,10 @@ uint8_t JRfm95::waitAck(uint8_t *array)
 		uint8_t localLen = spi->read(RH_RF95_REG_13_RX_NB_BYTES);
 
 		if(localLen != 9)
-			return 7;//гавно приняли
+		{
+			setMode(RHModeRx);
+			return 6;//гавно приняли, подождем ещё раз аск
+		}
 		spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR,
 				spi->read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)); // Reset the fifo read ptr to the beginning of the packet
 		spi->read(RH_RF95_REG_00_FIFO, array, 9);
