@@ -10,7 +10,7 @@
 #define delay(ms)	delayMs(ms)
 #define CAD_TIMEOUT	10000
 #define TX_TIMEOUT	3000
-#define RX_TIMEOUT	3000
+#define RX_TIMEOUT	1000
 
 SpiStm8l051 spiStm8l;
 uint8_t ver;
