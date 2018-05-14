@@ -188,6 +188,10 @@ void checkSleep()
 
 		delayMs(500);
 #ifdef USE_HALT
+		TIM4_Cmd(DISABLE);
+		if(timerProt == 0)
+		{
+		  ledOff();
 		initHalt();
 		//CLK->PCKENR1 = 0;
 		//GPIO_Init(GPIOB, GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7, GPIO_Mode_In_PU_No_IT );
@@ -197,6 +201,8 @@ void checkSleep()
 		GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
 		USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
 		| USART_CR2_RIEN;
+		}
+		TIM4_Cmd(ENABLE);
 #endif
 		//serial.print("wakeup\n\r", true);
 		//serial.flush();

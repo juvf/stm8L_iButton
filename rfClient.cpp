@@ -48,7 +48,7 @@ void setupRf95()
 uint8_t stateLora = 0; //0 - нет передачи
 void loraRutine()
 {
-	uint8_t array[12];
+	static uint8_t array[12];
 	static uint8_t attempt = 0;
 
 	//serial.print("rI", false);
@@ -104,6 +104,7 @@ void loraRutine()
 	//serial.println(stateLora);
 }
 
+//#pragma optimize=none
 bool isGoodAsk(uint8_t *array)
 {
 	if(Checksum::crc16(array, 9) != 0)

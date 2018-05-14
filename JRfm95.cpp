@@ -454,6 +454,7 @@ uint8_t JRfm95::waitSend()
 	return 3;
 }
 
+#pragma optimize=none
 uint8_t JRfm95::waitAck(uint8_t *array)
 {
 	if((millis() - tempTime1) > RX_TIMEOUT)
@@ -473,8 +474,9 @@ uint8_t JRfm95::waitAck(uint8_t *array)
 			setMode(RHModeRx);
 			return 6;//гавно приняли, подождем ещё раз аск
 		}
-		spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR,
-				spi->read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)); // Reset the fifo read ptr to the beginning of the packet
+		
+		uint8_t adrF = spi->read(RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR);
+		spi->write(RH_RF95_REG_0D_FIFO_ADDR_PTR, adrF); // Reset the fifo read ptr to the beginning of the packet
 		spi->read(RH_RF95_REG_00_FIFO, array, 9);
 
 		spi->write(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
