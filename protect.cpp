@@ -10,7 +10,7 @@
 #define PIN_PROTECT_2 GPIO_Pin_2 //вход охрана 2
 
 uint8_t oldState[2];
-#pragma optimize=none
+//#pragma optimize=none
 void protect()
 {
 	if((GPIOB->IDR & PIN_PROTECT_1) == 0) //порт 1 сработал

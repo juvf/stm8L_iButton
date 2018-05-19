@@ -9,12 +9,13 @@
 #include "main.h"
 #include "Serial.h"
 #include "varInEeprom.h"
+#include "beeper.h"
 
 //const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
 extern uint8_t iBut;//состояние работы считывателя iButton
 uint8_t iarray[8];
-#pragma optimize=none
+//#pragma optimize=none
 void checkIButton()
 {
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
@@ -42,12 +43,14 @@ void checkIButton()
 					switch(protection)
 					{
 						case 0: //снято с охраны - ставим
+							beepOn(300);
 							timerProt = 10000;
 							protection = 1;
 							isSendLora = true;
 							break;
 						case 1: //постановка на охрану, отмена
 							timerProt = 0;
+							beepOn(200, 200);
 							ledOff();
 							protection = 0;
 							isSendLora = true;
@@ -55,6 +58,7 @@ void checkIButton()
 						case 3:
 						case 2: //стоит на охране, сняте с охраны
 						case 4:
+							beepOn(200, 200);
 							protection = 0;
 							timerProt = 1000;
 							isSendLora = true;
