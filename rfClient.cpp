@@ -8,6 +8,7 @@
 #include "eeprom.h"
 #include "varInEeprom.h"
 #include "utils.h"
+#include "protect.h"
 
 #include <string.h>
 
@@ -47,46 +48,86 @@ void setupRf95()
 uint8_t stateLora = 0; //0 - нет передачи
 void loraRutine()
 {
+	static uint8_t array[12];
+	static uint8_t attempt = 0;
+
+	//serial.print("rI", false);
+	//serial.print(stateLora);
+
+
 	switch(stateLora)
 	{
+		case 5: //не было отправки успешной
+			if(--attempt > 0)
+			{
+				jLora.rfm95.startCad();
+				stateLora = 1;
+			}
+			else
+				stateLora = 0;
+			break;
 		case 0:
-			if(protection)
-				jLora.startCad();
+			setupRf95();
+			jLora.rfm95.startCad();
+			attempt = 10;
+			++numPack;
 			stateLora = 1;
 			break;
 		case 1:
-			stateLora = jLora.waitCad();
+			stateLora = jLora.rfm95.waitCad();
 			break;
 		case 2:
 		{
-			uint8_t array[12];
-			preparePack(array);
-			jLora.startSend(array, 12); //готовим пакет
+			preparePack(array); //готовим пакет
+			serial.print("Start send p=", false);
+			serial.println(numPack);
+			jLora.rfm95.startSend(array, 12);
 			stateLora = 3;
 		}
 			break;
 		case 3:
-			stateLora = jLora.waitSend(); //готовим пакет
+			stateLora = jLora.rfm95.waitSend(); // ждем отправки
 			break;
 		case 4: //не дождались CAD
-			break;
-		case 5: //не было отправки успешной
+			stateLora = 5; //повторим попытку
 			break;
 		case 6: //ждем аск
-			stateLora = waitAck();
+			stateLora = jLora.rfm95.waitAck(array);
+			if(stateLora == 8)
+				serial.print("Recive Ask", true);
 			break;
-		case 7: //не дождались аск
-			break;
-		case 8: //удачная отправка
+		case 8: //дождались аск, проверим - тот аск?
+			stateLora = isGoodAsk(array) ? 0 : 5;
 			break;
 	}
-
+	//serial.print("rO", false);
+	//serial.println(stateLora);
 }
 
+//#pragma optimize=none
+bool isGoodAsk(uint8_t *array)
+{
+	if(Checksum::crc16(array, 9) != 0)
+		return false;
+
+	uint16_t adrDst = (array[1]<<8) | array[0];//проверим адрес получателя
+	if(adrDst != config.addressOfModul)
+		return false;
+
+	if(array[6] != 4) //проверим тип пакета
+		return false;
+
+	uint16_t numP = (array[5]<<8) | array[4];//провекрим номер пакета
+	if(numP != numPack)
+		return false;
+	return true;
+}
+
+/*
+ * подготовка пакета к отправке. Заполняется шапка пакета
+ */
 void preparePack(uint8_t *array)
 {
-	static uint8_t numPack = 0;
-	++numPack;
 	array[0] = config.addressOfServer;
 	array[1] = config.addressOfServer >> 8;
 	array[2] = config.addressOfModul;
@@ -94,31 +135,35 @@ void preparePack(uint8_t *array)
 	array[4] = numPack;
 	array[5] = numPack >> 8;
 	array[6] = 4;
-	array[7] = protect;
+	array[7] = protection;
 	array[8] = getProtect(); //состояние входов
 	array[9] = (uint8_t)config.countStarts; //счетчик сбросов
 	Checksum::addCrc16(array, 10);
 }
 
-void waitResive()
-{
-	uint8_t buf[32]; //RH_RF95_FIFO_SIZE];
-	uint8_t len = sizeof(buf);
-	if(0) //jLora.waitAvailableTimeout(100))
-	{
-		if(jLora.recive(buf, &len))
-		{
-			serial.print("Got Packed. RSSI: ");
-//			serial.println(rf95.lastRssi(), DEC);
-			parserLoraProtocol(buf, len);
-		}
-		//else
-		{
-			//serial.println("recv failed");
-		}
-	}
-}
+//void waitResive()
+//{
+//	uint8_t buf[32]; //RH_RF95_FIFO_SIZE];
+//	uint8_t len = sizeof(buf);
+//	if(0) //jLora.waitAvailableTimeout(100))
+//	{
+//		if(jLora.recive(buf, &len))
+//		{
+//			serial.print("Got Packed. RSSI: ");
+////			serial.println(rf95.lastRssi(), DEC);
+//			parserLoraProtocol(buf, len);
+//		}
+//		//else
+//		{
+//			//serial.println("recv failed");
+//		}
+//	}
+//}
 
+/*
+ * при получении команды по лоре команда обрабатывается и исполняется
+ * в этом парсере
+ */
 void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 {
 	if(Checksum::crc16(buffer, len) == 0)
@@ -147,7 +192,10 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 		}
 	}
 }
-
+/*
+ * Функция получает пакет PackJ из массива данных buffer
+ * и помещает его по указателю pack
+ */
 void getPackJ(PackJ *pack, uint8_t *buffer)
 {
 	pack->dst = buffer[0] | (buffer[1] << 8);

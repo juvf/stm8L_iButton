@@ -8,12 +8,14 @@
 #include "timerJ.h"
 #include "main.h"
 #include "Serial.h"
+#include "varInEeprom.h"
+#include "beeper.h"
 
-const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
+//const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
-extern uint8_t iBut;
+extern uint8_t iBut;//состояние работы считывателя iButton
 uint8_t iarray[8];
-#pragma optimize=none
+//#pragma optimize=none
 void checkIButton()
 {
 	GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_Out_OD_HiZ_Slow);
@@ -29,25 +31,34 @@ void checkIButton()
 		{
 			if(readKey())
 			{ //прислонили ключ
-				if(keyIsGood())
+				if(isReadingKey)
+				{
+					keyIsReaded = true;
+					iBut = 7;
+				}
+				else if(keyIsGood())
 				{
 					disableInterrupts();
 					//меняем состояние охрана/снято
 					switch(protection)
 					{
 						case 0: //снято с охраны - ставим
+							beepOn(300);
 							timerProt = 10000;
 							protection = 1;
 							isSendLora = true;
 							break;
 						case 1: //постановка на охрану, отмена
 							timerProt = 0;
+							beepOn(200, 200);
 							ledOff();
 							protection = 0;
 							isSendLora = true;
 							break;
 						case 3:
 						case 2: //стоит на охране, сняте с охраны
+						case 4:
+							beepOn(200, 200);
 							protection = 0;
 							timerProt = 1000;
 							isSendLora = true;
@@ -55,7 +66,7 @@ void checkIButton()
 					}
 					iBut = 7;
 					protectPause = 1000;
-					serial.print("pp", false);
+					serial.print("p!", false);
 					enableInterrupts();
 				}
 			}
@@ -82,29 +93,53 @@ void checkIButton()
 	}
 }
 
+/*
+ * Проверка хороший ключ или нет. Если код ключа в временном массиве iarray
+ * есть в списке разрешённых, то возвращаем true, иначе false
+ */
 bool keyIsGood()
 {
-	for(uint8_t i = 0; i < 6; i++)
-		if(iarray[i + 1] != goodKey[i])
-			return false;
-	return true;
+	for(uint8_t j = 0; j < 5; j++)
+	{
+		if(config.flags | (1 << j))
+		{
+			bool result = true;
+			for(uint8_t i = 0; i < 6; i++)
+			{
+				if(iarray[i + 1] != config.iButton[j][i])
+				{
+					result = false;
+					break;
+				}
+			}
+			if(result)
+				return true;
+		}
+	}
+	return false;
 }
 
+/*
+ * Чтение кода ключа в массив  iarray[]
+ * После прочтения проверка CRC.
+ * Если удачно прочитан и CRC совпало, то возвращаем true, иначе false
+ */
 bool readKey()
 {
 	delayMs(2);
 	if(GPIOB->IDR & GPIO_Pin_3)
 	{
-		//записывем команду
-
 		OWReadKey();
-		static uint8_t y = iButtonCrc();
+		uint8_t y = iButtonCrc();
 		if((y == 0) && (iarray[0] == 1))
 			return true;
 	}
 	return false;
 }
 
+/*
+ * запись байта на шину 1-Wire
+ */
 #pragma optimize=none
 void OWWriteByte(uint8_t byte)
 {
@@ -131,6 +166,10 @@ void OWWriteByte(uint8_t byte)
 	}
 	enableInterrupts();
 }
+
+/*
+ * Чтение одного байта с шины 1-Wire
+ */
 #pragma optimize=none
 void OWReadKey()
 {
@@ -183,6 +222,10 @@ void OWReadKey()
 	}
 }
 
+
+/*
+ * Подсчет CRC пор алгоритму для iButton
+ */
 uint8_t iButtonCrc()
 {
 	uint8_t crc = 0;

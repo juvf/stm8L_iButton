@@ -22,6 +22,7 @@ void initWakeup();
 void wakeup();
 void initHalt();
 void sendReplay();
+void checkReadKey();
 void memcpyN(uint8_t *dis, const uint8_t *source, uint8_t len);
   
 #ifdef __cplusplus

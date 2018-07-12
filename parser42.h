@@ -25,7 +25,8 @@ typedef enum
 	L_GetLoraMode,
 	L_GetFreqChanel,// = 13
 	L_WriteMem,
-	L_ReadMem//15
+	L_ReadMem,//15
+	L_ReadKey//16
 
 } LoraCommand;
 

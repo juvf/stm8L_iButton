@@ -16,8 +16,9 @@ typedef struct
 	uint8_t bw; //11 старший бит - 0=sx1272, 1=1276
 	uint32_t freq; //12-15
 	float coeff; //16-19
-	uint8_t isProgramm;
-	uint8_t reserv;
+	uint8_t isProgramm; //20
+	uint8_t flags; //21 валидные ключи, биты 0-4
+	uint8_t iButton[5][6];
 } Eeprom;
 
 extern __no_init uint16_t periodOprosa;

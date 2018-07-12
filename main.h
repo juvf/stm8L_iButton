@@ -25,21 +25,29 @@ extern "C"
 #define ledOn()	(PORT_LED->ODR |= PIN_LED)
 #define ledOff()	(PORT_LED->ODR &= ~PIN_LED)
 
+
+
 extern uint16_t timeToSleep;
 extern uint16_t timeToSleepUart;
 
-/*Текущее состояние
+/*Текущее состояние охраны
  * 0 - снято с охраны
  * 1 - постановка на охрану
- * 2 - сняте с охраны
+ * 2 - стоит на охране
  * 3 - тревога
- * 4 - стоит на охране
+ * 4 - сработал датчик, запущен таймер, стоит на охране
  */
 extern uint8_t protection;
 extern uint16_t timerProt;
 extern uint16_t protectPause;
 
 extern volatile bool isSendLora; //пакет который нужно отправить по охране
+extern volatile bool isReadingKey; //получен запрос на чтение нового ключа
+extern volatile bool keyIsReaded; //ключ прочитан
+extern uint16_t timerReadKye; //таймер для чтения нового ключа
+
+extern uint16_t numPack; //номер пакета. Для защиты от повторных отправок из шлюза в БД
+
 
 void initPeref();
 void checkSleep();
