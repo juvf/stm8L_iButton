@@ -18,7 +18,7 @@ void protect()
 		if(oldState[0] == 0)
 		{
 			if(protection == 2)
-			{
+			{//если 2 - сняте с охраны
 				if(timerProt == 0)
 					timerProt = 10000;
 			}
