@@ -6,7 +6,6 @@
 #include "JLora.h"
 #include "timerJ.h"
 #include "eeprom.h"
-#include "varInEeprom.h"
 #include "utils.h"
 #include "protect.h"
 
@@ -21,12 +20,12 @@ JLora jLora;
 
 void setupRf95()
 {
-	/*	serial.print("\n\rStart Program\n\r");
+	serial.print("\n\rStart Program\n\r");
 	 serial.flush();
 	 serial.print(__DATE__);
 	 serial.print("   ");
 	 serial.print(__TIME__, true);
-	 serial.flush();*/
+	 serial.flush();
 
 	bool isOk = jLora.rfm95.initial();
 	if(!isOk)
@@ -45,7 +44,7 @@ void setupRf95()
 	//jLora.printRegOfRfm95();
 }
 
-uint8_t stateLora = 0; //0 - нет передачи
+uint8_t stateLora = 0; //0 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 void loraRutine()
 {
 	static uint8_t array[12];
@@ -57,7 +56,7 @@ void loraRutine()
 
 	switch(stateLora)
 	{
-		case 5: //не было отправки успешной
+		case 5: //пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(--attempt > 0)
 			{
 				jLora.rfm95.startCad();
@@ -78,7 +77,7 @@ void loraRutine()
 			break;
 		case 2:
 		{
-			preparePack(array); //готовим пакет
+			preparePack(array); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			serial.print("Start send p=", false);
 			serial.println(numPack);
 			jLora.rfm95.startSend(array, 12);
@@ -86,17 +85,17 @@ void loraRutine()
 		}
 			break;
 		case 3:
-			stateLora = jLora.rfm95.waitSend(); // ждем отправки
+			stateLora = jLora.rfm95.waitSend(); // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			break;
-		case 4: //не дождались CAD
-			stateLora = 5; //повторим попытку
+		case 4: //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CAD
+			stateLora = 5; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			break;
-		case 6: //ждем аск
+		case 6: //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 			stateLora = jLora.rfm95.waitAck(array);
 			if(stateLora == 8)
 				serial.print("Recive Ask", true);
 			break;
-		case 8: //дождались аск, проверим - тот аск?
+		case 8: //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅпїЅ?
 			stateLora = isGoodAsk(array) ? 0 : 5;
 			break;
 	}
@@ -110,21 +109,21 @@ bool isGoodAsk(uint8_t *array)
 	if(Checksum::crc16(array, 9) != 0)
 		return false;
 
-	uint16_t adrDst = (array[1]<<8) | array[0];//проверим адрес получателя
+	uint16_t adrDst = (array[1]<<8) | array[0];//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if(adrDst != config.addressOfModul)
 		return false;
 
-	if(array[6] != 4) //проверим тип пакета
+	if(array[6] != 4) //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		return false;
 
-	uint16_t numP = (array[5]<<8) | array[4];//провекрим номер пакета
+	uint16_t numP = (array[5]<<8) | array[4];//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	if(numP != numPack)
 		return false;
 	return true;
 }
 
 /*
- * подготовка пакета к отправке. Заполняется шапка пакета
+ * пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
  */
 void preparePack(uint8_t *array)
 {
@@ -136,8 +135,8 @@ void preparePack(uint8_t *array)
 	array[5] = numPack >> 8;
 	array[6] = 4;
 	array[7] = protection;
-	array[8] = getProtect(); //состояние входов
-	array[9] = (uint8_t)config.countStarts; //счетчик сбросов
+	array[8] = getProtect(); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	array[9] = (uint8_t)config.countStarts; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Checksum::addCrc16(array, 10);
 }
 
@@ -161,8 +160,8 @@ void preparePack(uint8_t *array)
 //}
 
 /*
- * при получении команды по лоре команда обрабатывается и исполняется
- * в этом парсере
+ * пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+ * пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
  */
 void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 {
@@ -177,7 +176,7 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 			{
 				default:
 					break;
-				case 1: //команда управление GPIO
+				case 1: //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GPIO
 				{
 					if(pack.data[0] == 1)
 					{
@@ -193,8 +192,8 @@ void parserLoraProtocol(uint8_t *buffer, uint8_t len)
 	}
 }
 /*
- * Функция получает пакет PackJ из массива данных buffer
- * и помещает его по указателю pack
+ * пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ PackJ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ buffer
+ * пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ pack
  */
 void getPackJ(PackJ *pack, uint8_t *buffer)
 {
@@ -204,7 +203,7 @@ void getPackJ(PackJ *pack, uint8_t *buffer)
 	pack->type = buffer[6];
 	switch(pack->type)
 	{
-		case 1: //управление выходными GPIO
+		case 1: //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GPIO
 			pack->payloadlength = 2;
 			break;
 		default:
