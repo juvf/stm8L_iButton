@@ -13,7 +13,7 @@
 
 //const uint8_t goodKey[] = { 0x2c, 0xbb, 0xb4, 0x0c, 0, 0 };
 
-extern uint8_t iBut;//состояние работы считывателя iButton
+extern uint8_t iBut; //состояние работы считывателя iButton
 uint8_t iarray[8];
 //#pragma optimize=none
 void checkIButton()
@@ -63,25 +63,29 @@ void checkIButton()
 							timerProt = 1000;
 							isSendLora = true;
 							break;
+
 					}
 					iBut = 7;
 					protectPause = 1000;
 					serial.print("p!", false);
 					enableInterrupts();
 				}
+				ibut = 6;
 			}
 			else
 				iBut++;
 		}
 			break;
-		case 6: //не смогли 2 раза прочитать. ложимси спать
+		case 6:
+//не смогли раза прочитать. ложимси спать
 			disableInterrupts();
 			GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_FL_IT); //разрешим прерывания
 			iBut = 0;
 			ledOff();
 			enableInterrupts();
 			break;
-		case 7: //защитная пауза в 3 секунды
+		case 7:
+//защитная пауза в 3 секунды
 			disableInterrupts();
 			if(protectPause == 0)
 			{
@@ -221,7 +225,6 @@ void OWReadKey()
 		enableInterrupts();
 	}
 }
-
 
 /*
  * Подсчет CRC пор алгоритму для iButton
