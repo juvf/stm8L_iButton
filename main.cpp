@@ -50,7 +50,7 @@ int main()
 		periodOprosa = config.periodOprosa;
 	else
 		periodOprosa = 0xffff;
-
+	
 	EEPROM_Unlock();
 	config.countStarts++;
 	EEPROM_Lock();
