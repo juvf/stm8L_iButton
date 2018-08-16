@@ -30,7 +30,7 @@ void JRfm95::reset()
 	delay(2);
 	GPIO_SetBits(GPIOC, RFM_PIN_RESET);
 }
-//#pragma optimize=none
+#pragma optimize=none
 bool JRfm95::initial()
 {
 	rfm = this;

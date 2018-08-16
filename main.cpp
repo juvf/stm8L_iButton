@@ -13,7 +13,6 @@
 #include "eeprom.h"
 #include "iButton.h"
 #include "protect.h"
-#include "beeper.h"
 
 #include <string.h>
 
@@ -42,7 +41,6 @@ int main()
 	disableInterrupts();
 
 	initPeref();
-
 	ledOn();
 	bool enTransmit = (config.isProgramm == 0x55);
 
@@ -50,7 +48,7 @@ int main()
 		periodOprosa = config.periodOprosa;
 	else
 		periodOprosa = 0xffff;
-	
+
 	EEPROM_Unlock();
 	config.countStarts++;
 	EEPROM_Lock();
@@ -101,14 +99,14 @@ int main()
 				}
 				break;
 			case 4: //снимаем с охраны
-				timeToSleep = 1000;
+			  	timeToSleep = 1000;
 				if(timerProt == 0)
 				{
-					isSendLora = true;
+				  	isSendLora = true;
 					protection = 3;
 				}
 				break;
-			case 3: //тревога
+			case 3://тревога
 				protect();
 				break;
 			case 2: //охраняем
@@ -147,20 +145,21 @@ void initPeref()
 	serial.init();
 	intiTimerJ();
 	initWakeup();
-	beeperInit();
 	//GPIO_Init(GPIOC, RFM_PIN_RESET, GPIO_Mode_Out_PP_High_Slow );
 	GPIO_Init(GPIOC, RFM_PIN_RESET, GPIO_Mode_Out_OD_HiZ_Slow);
 	//неиспользуемые пины
 	GPIO_Init(GPIOA, GPIO_Pin_1 | GPIO_Pin_0, GPIO_Mode_In_PU_No_IT); //GPIO_Mode_In_PU_No_IT
 	GPIO_Init(GPIOC, GPIO_Pin_0, GPIO_Mode_In_FL_No_IT);
-	GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_FL_No_IT);
-
+	GPIO_Init(GPIOD, GPIO_Pin_0, GPIO_Mode_In_FL_No_IT); 
+	
+	
 	//GPIO_Init(GPIOB, GPIO_Pin_0, GPIO_Mode_In_FL_No_IT);
 	//GPIO_Init(GPIOB, GPIO_Pin_1, GPIO_Mode_In_PU_No_IT); 
 	//GPIO_Init(GPIOB, GPIO_Pin_2, GPIO_Mode_In_FL_IT);
 	//GPIO_Init(GPIOB, GPIO_Pin_3, GPIO_Mode_In_PU_No_IT); 
-
+	
 	//GPIO_Init(GPIOA, GPIO_Pin_2 | GPIO_Pin_3, GPIO_Mode_In_PU_No_IT); //GPIO_Mode_In_PU_No_IT
+	
 
 	enableInterrupts();
 
@@ -168,8 +167,6 @@ void initPeref()
 	delayMs(1000);
 
 	setupRf95();
-
-
 
 	CLK->ICKCR |= CLK_ICKCR_SAHALT;
 	PWR->CSR2 |= PWR_CSR2_ULP;
@@ -182,7 +179,7 @@ void checkSleep()
 	delayMs(50); //пауза, чтобы закончил работу уарт;
 	if((timeToSleep == 0) && (timeToSleepUart == 0) && (stateLora == 0)
 			&& !serial.isGetCommand() && !isSendLora && (timerProt == 0)
-			&& (iBut == 0) && (curentPulse == 0))
+			&& (iBut == 0))
 	{
 		//releOn();
 		jLora.rfm95.setMode(RHModeSleep);
@@ -194,16 +191,16 @@ void checkSleep()
 		TIM4_Cmd(DISABLE);
 		if(timerProt == 0)
 		{
-			ledOff();
-			initHalt();
-			//CLK->PCKENR1 = 0;
-			//GPIO_Init(GPIOB, GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7, GPIO_Mode_In_PU_No_IT );
+		  ledOff();
+		initHalt();
+		//CLK->PCKENR1 = 0;
+		//GPIO_Init(GPIOB, GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7, GPIO_Mode_In_PU_No_IT );
 
-			halt();
+		halt();
 
-			GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
-			USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
-					| USART_CR2_RIEN;
+		GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
+		USART1->CR2 = USART_CR2_TCIEN | USART_CR2_REN | USART_CR2_TEN
+		| USART_CR2_RIEN;
 		}
 		TIM4_Cmd(ENABLE);
 #endif

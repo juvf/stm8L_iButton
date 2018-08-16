@@ -2,8 +2,6 @@
 #include "Lancher.h"
 #include "main.h"
 #include "varInEeprom.h"
-#include "beeper.h"
-
 uint32_t msDelay = 0;
 volatile uint16_t msMillis = 0;
 
@@ -44,6 +42,9 @@ void tim4Handler()
 	if(timeToSleep)
 		--timeToSleep;
 
+	//if(msMillis >= 999)
+	//	msMillis = 0;
+	//else
 	++msMillis;
 	if(timerProt)
 	{
@@ -57,10 +58,5 @@ void tim4Handler()
 		--timeToSleepUart;
 	if(protectPause)
 		--protectPause;
-
-	if(msMillis%10 == 0)
-	{
-		beepreRoutine();
-	}
 }
 
