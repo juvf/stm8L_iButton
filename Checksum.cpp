@@ -5,7 +5,7 @@ uint16_t Checksum::crcIn;
 #pragma optimize=none
 unsigned int crc16_byte(unsigned int crc, unsigned int data)
 {
-	const unsigned int Poly16=0xA001;
+	//const unsigned int Poly16=0xA001;
 	unsigned int LSB;
 	crc = ((crc^data) | 0xFF00) & (crc | 0x00FF);
 	for (uint8_t i=0; i<8; i++) 
@@ -13,7 +13,7 @@ unsigned int crc16_byte(unsigned int crc, unsigned int data)
 		LSB=(crc & 0x0001);
 		crc >>= 1;
 		if(LSB)
-			crc=crc^Poly16;
+			crc=crc^0xA001;
 	}
 	return crc;
 }

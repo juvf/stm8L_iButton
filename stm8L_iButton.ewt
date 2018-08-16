@@ -2103,6 +2103,9 @@
             <name>$PROJ_DIR$\spl\stm8l15x.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\spl\stm8l15x_beep.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\spl\stm8l15x_clk.c</name>
         </file>
         <file>
@@ -2151,6 +2154,12 @@
             <name>$PROJ_DIR$\spl\stm8l15x_usart.h</name>
         </file>
     </group>
+    <file>
+        <name>$PROJ_DIR$\beeper.cpp</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\beeper.h</name>
+    </file>
     <file>
         <name>$PROJ_DIR$\Checksum.cpp</name>
     </file>

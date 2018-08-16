@@ -33,7 +33,7 @@ void Serial::init()
 	 UART1_PARITY_NO,
 	 UART1_SYNCMODE_CLOCK_DISABLE,
 	 UART1_MODE_TXRX_ENABLE); */
-	//UART1_CR1 = 0; //закоментировал, т.к. после ресета CR1 равен 0
+	//UART1_CR1 = 0; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ CR1 пїЅпїЅпїЅпїЅпїЅ 0
 	CLK->PCKENR1 |= CLK_PCKENR1_USART1;
 	GPIO_Init(GPIOC, GPIO_Pin_5, GPIO_Mode_Out_PP_Low_Fast); // PC5 TX USART1 transmit
 	GPIO_Init(GPIOC, GPIO_Pin_6, GPIO_Mode_In_PU_No_IT);
@@ -109,8 +109,8 @@ void Serial::startTransmit()
 	if(!isTransmoin)
 	{
 		USART1->DR = buffer[countTx++];
-		if(countBuf > (MAX_SIZE - 1))
-			countBuf = 0;
+		if(countTx >= MAX_SIZE )
+			countTx = 0;
 //		UCSR0B |= (1<<TXCIE0);//USART1->CR1 |= USART_CR1_TCIE;
 		isTransmoin = true;
 //		//uint8_t avr = UCSR0B;
@@ -163,7 +163,7 @@ void Serial::reciveByte(uint8_t byte)
 			else
 				count42 = 0;
 			break;
-		case 2: //длинна пакета
+		case 2: //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			if(byte < MAX_SIZE)
 			{
 				buffer42[2] = byte;
@@ -178,7 +178,7 @@ void Serial::reciveByte(uint8_t byte)
 			{
 				if(Checksum::crc16(buffer42, count42) == 0)
 				{
-					isResive = true; //приняли весь пакет
+					isResive = true; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 					sendReplay();
 					this->startTransmit();
 					//timeToSleepUart = 2;
@@ -222,7 +222,7 @@ void handlerUsartRxD()
 	if(USART1->SR & USART_FLAG_OR)
 		serial.reciveByte(USART1->DR);
 	if(USART1->SR & USART_FLAG_RXNE)
-		serial.reciveByte(USART1->DR); //при чтении флаг прерывания сам почиститься
+		serial.reciveByte(USART1->DR); //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	timeToSleepUart = 400;
 
