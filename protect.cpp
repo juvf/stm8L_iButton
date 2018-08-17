@@ -6,11 +6,11 @@
  */
 #include "protect.h"
 #include "main.h"
-#define PIN_PROTECT_1 GPIO_Pin_1 //вход охрана геркон внутренний
-#define PIN_PROTECT_2 GPIO_Pin_2 //вход охрана геркон внешний
+#define PIN_PROTECT_1 GPIO_Pin_1 //вход охрана 1
+#define PIN_PROTECT_2 GPIO_Pin_2 //вход охрана 2
 
 uint8_t oldState[2];
-//#pragma optimize=none
+#pragma optimize=none
 void protect()
 {
 	if((GPIOB->IDR & PIN_PROTECT_1) == 0) //порт 1 сработал
