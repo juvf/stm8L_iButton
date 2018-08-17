@@ -182,6 +182,8 @@ void checkSleep()
 			&& (iBut == 0))
 	{
 		//releOn();
+		jLora.printRegOfRfm95();
+		delayMs(100);
 		jLora.rfm95.setMode(RHModeSleep);
 		//serial.print("\n\rSleep  ", true);
 		//serial.flush();
