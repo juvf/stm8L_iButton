@@ -183,7 +183,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 153</file>
+=======
+                    <file> 62 108 135 114 122 123 118 119 121 106 113 74 147</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -210,7 +214,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 140</file>
+=======
+                    <file> 43 108 135 114 122 123 118 119 121 106 113 74 130 141 47 62 147 128 136</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -237,7 +245,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 102</file>
+=======
+                    <file> 47 108 135 114 122 123 118 119 121 106 113 74 149 147 128 62</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -264,7 +276,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 119</file>
+=======
+                    <file> 106 108 135 114 122 123 118 119 121 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -291,7 +307,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 80</file>
+=======
+                    <file> 114 108 135 122 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -345,7 +365,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 122</file>
+=======
+                    <file> 122 108 135 114 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -372,7 +396,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 76</file>
+=======
+                    <file> 118 108 135 114 122 123 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -399,7 +427,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 116</file>
+=======
+                    <file> 119 108 135 114 122 123 118 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -426,7 +458,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 82</file>
+=======
+                    <file> 133 108 135 114 122 123 118 119 121 106 113 74 47</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -453,7 +489,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 84</file>
+=======
+                    <file> 123 108 135 114 122 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -480,7 +520,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 54</file>
+=======
+                    <file> 113 108 135 114 122 123 118 119 121 106 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -507,7 +551,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 104</file>
+=======
+                    <file> 121 108 135 114 122 123 118 119 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -534,7 +582,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 52</file>
+=======
+                    <file> 126 108 135 114 122 123 118 119 121 106 113 74 143 127 142 136 130 62 147 47 43 128 153 39 101 38 53 100 98 58 70 103</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -561,7 +613,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 66</file>
+=======
+                    <file> 136 108 135 114 122 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -579,6 +635,10 @@
             <name>$PROJ_DIR$\JSpi.cpp</name>
             <outputs>
                 <tool>
+                    <name>ICCSTM8</name>
+                    <file> 26</file>
+                </tool>
+                <tool>
                     <name>__cstat</name>
                     <file> 81</file>
                 </tool>
@@ -588,7 +648,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 71</file>
+=======
+                    <file> 153 108 135 114 122 123 118 119 121 106 113 74 128</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -615,7 +679,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 48</file>
+=======
+                    <file> 108 135 114 122 123 118 119 121 106 113 74 147 62 47 128 130 143 127 142 154 126 43 151 153 39 101 38 53 100 98 58 70 103</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -642,7 +710,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 90</file>
+=======
+                    <file> 134 108 135 114 122 123 118 119 121 106 113 74 127</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -669,7 +741,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 149</file>
+=======
+                    <file> 143 108 135 114 122 123 118 119 121 106 113 74 127 142 47 134 130 62 147 39 101 38 53 100 98 58 70 103</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -696,7 +772,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 57</file>
+=======
+                    <file> 127 108 135 114 122 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -714,6 +794,10 @@
             <name>$PROJ_DIR$\Serial.cpp</name>
             <outputs>
                 <tool>
+                    <name>ICCSTM8</name>
+                    <file> 52</file>
+                </tool>
+                <tool>
                     <name>__cstat</name>
                     <file> 150</file>
                 </tool>
@@ -723,7 +807,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 106</file>
+=======
+                    <file> 151 108 135 114 122 123 118 119 121 106 113 74 47 128 130 62 147</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -750,7 +838,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 143</file>
+=======
+                    <file> 141 108 135 114 122 123 118 119 121 106 113 74 130 136 128 149 147 154 126 143 127 142 62 43 47 39 101 38 53 100 98 58 70 103</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -796,7 +888,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 114</file>
+=======
+                    <file> 145 108 135 114 122 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -814,6 +910,10 @@
             <name>$PROJ_DIR$\timerJ.cpp</name>
             <outputs>
                 <tool>
+                    <name>ICCSTM8</name>
+                    <file> 99</file>
+                </tool>
+                <tool>
                     <name>__cstat</name>
                     <file> 108</file>
                 </tool>
@@ -823,7 +923,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 146</file>
+=======
+                    <file> 154 126 108 135 114 122 123 118 119 121 106 113 74 143 127 142 130 128 136 47 147 62 43 153 39 101 38 53 100 98 58 70 103</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -850,7 +954,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 89</file>
+=======
+                    <file> 130 108 135 114 122 123 118 119 121 106 113 74 136 128 43 39 101 38 53 100 98 58 70 103 71 27</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
@@ -877,7 +985,11 @@
                 </tool>
                 <tool>
                     <name>ICCSTM8</name>
+<<<<<<< HEAD
                     <file> 152</file>
+=======
+                    <file> 147 108 135 114 122 123 118 119 121 106 113 74</file>
+>>>>>>> d730d709f7c2d9f32f15c434d7d4ac5e535f32d9
                 </tool>
             </outputs>
             <inputs>
