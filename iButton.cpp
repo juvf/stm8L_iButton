@@ -171,15 +171,39 @@ void OWReadKey()
 {
 	for(uint8_t i = 0; i < 8; i++)
 		iarray[i] = 0;
+	
+	
+	
+	
+	
+	]
+	
+	
+	
+	
+	
 	disableInterrupts();
+	
+	
+	
+	
+	
+	
+	
 	GPIOB->ODR &= ~GPIO_Pin_3; //шину в 0
-	for(uint16_t y = 0; y < 250; y++)
+	for(uint16_t y = 0; y < 250; y
 		;
+		
 	GPIOB->ODR |= GPIO_Pin_3; //шину в 1
 	//enableInterrupts();
 
+	
+	
+	
 	for(uint8_t y = 0; y < 40; y++)
 		; //100 us
+	
+	
 	if(GPIOB->IDR & GPIO_Pin_3)
 	{
 		enableInterrupts();
